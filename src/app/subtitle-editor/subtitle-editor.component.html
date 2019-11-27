@@ -1,0 +1,19 @@
+<app-toolbar [subtitleList]="subtitleList" (videoSelected)="videoSelected($event)" (yTLinkPlayed)="yTLinkPlayed($event)"
+  (subtitleSelected)="subtitleSelected($event)" (translationSelected)="translationSelected($event)"></app-toolbar>
+<mat-sidenav-container class=" sidenav-container">
+  <mat-sidenav mode="side" opened class="sidenav">
+    <app-sidenav-embed-video [url]="url" [videoType]="videoType" (playerInitialized)="playerInitialized($event)"
+      (seekTo)="seekTo($event)" (played)="onPlayButton($event)" (audioVolumeChanged)="audioVolumeChanged($event)">
+    </app-sidenav-embed-video>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <app-audiovizualizer [url]="url" (wavesurferInitialized)="wavesurferInitialized($event)" (seekTo)="seekTo($event)">
+    </app-audiovizualizer>
+    <cdk-virtual-scroll-viewport [itemSize]="82" class="scroll-viewport" style="height: calc(100% - 101px);">
+      <app-script-line *cdkVirtualFor="let time of timeStamp; let i = index;" [index]="i" [indexActive]="indexActive"
+        [startMs]="time.startMs" [endMs]="time.endMs" [sentence]="script[i].sentence"
+        [translation]="scriptTranslation[i].sentence">
+      </app-script-line>
+    </cdk-virtual-scroll-viewport>
+  </mat-sidenav-content>
+</mat-sidenav-container>

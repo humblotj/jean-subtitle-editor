@@ -1,0 +1,22 @@
+.mat-toolbar {
+  padding: 0 !important;
+  height: auto !important;
+}
+
+.mat-tab-group {
+  width: 100% !important;
+}
+
+.mat-tab-label {
+  height: 30px !important;
+  min-width: 40px !important;
+}
+
+mat-form-field.mat-form-field {
+  font-size: 12px;
+}
+
+simple-snack-bar span {
+  margin: auto;
+  text-align: center;
+}

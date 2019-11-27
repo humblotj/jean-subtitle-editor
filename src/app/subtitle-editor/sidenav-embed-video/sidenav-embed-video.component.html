@@ -1,0 +1,29 @@
+<div #videoPlayerContainer></div>
+<div *ngIf="playerReady">
+  <mat-slider class="progress-slider" color="primary" min="1" max="100" step="0.01" [(value)]="progress"
+    (change)="progressChanged($event)">
+  </mat-slider>
+  <div fxLayoutAlign="space-between center" style="margin-top: -12px;">
+    <div fxLayout="row" fxLayoutAlign="start center">
+      <button *ngIf="paused" mat-icon-button (click)="play()">
+        <mat-icon svgIcon="play"></mat-icon>
+      </button>
+      <button *ngIf="!paused" mat-icon-button (click)="pause()">
+        <mat-icon svgIcon="pause"></mat-icon>
+      </button>
+      <span *ngIf="duration" style="font-size: 12px; margin-top: 5px;">{{currentTime}}/{{duration}}</span>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="start center">
+      <button *ngIf="audioVolume!==0" mat-icon-button (click)="muteAudio()">
+        <mat-icon *ngIf="audioVolume>0.5" svgIcon="volume-high"></mat-icon>
+        <mat-icon *ngIf="0.5>=audioVolume" svgIcon="volume-medium"></mat-icon>
+      </button>
+      <button *ngIf="audioVolume===0" mat-icon-button (click)="unmuteAudio()">
+        <mat-icon svgIcon="volume-low"></mat-icon>
+      </button>
+      <mat-slider style="width: 75px; min-width: 75px; margin-top: 5px; margin-left: -13px;" color="primary" min="0"
+        max="0.5" step="0.05" [(ngModel)]="audioVolume" (input)="onVolumeChange($event)">
+      </mat-slider>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+  <!-- <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px">
+    <mat-icon svgIcon="magnify-minus-outline"></mat-icon>
+    <mat-slider color="primary" min="1" max="400" step="10" [(ngModel)]="zoom" (input)="onZoomChange($event)">
+    </mat-slider>
+    <mat-icon svgIcon="magnify-plus-outline"></mat-icon>
+  </div> -->
+  <div *ngIf="progressRate!==100" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" style="padding: 12px;">
+    <mat-spinner [diameter]="30" *ngIf="!failed" [ngClass]="{'invisible':!inProgressLocal}">
+    </mat-spinner>
+    <span>{{progressRate}}%</span>
+  </div>
+  <div id="waveform" [ngClass]="{'waveform': true, 'hidden': progressRate!==100}"></div>
+  <div id="waveform-timeline"></div>
