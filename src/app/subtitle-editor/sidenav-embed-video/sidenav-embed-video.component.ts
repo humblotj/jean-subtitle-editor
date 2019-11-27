@@ -89,34 +89,34 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
       }
     );
 
-    this.playerInitialized.next(player);
+    this.playerInitialized.emit(player);
   }
 
   progressChanged(event: any) {
-    this.seekTo.next(event.value);
+    this.seekTo.emit(event.value);
   }
 
   pause() {
-    this.played.next(false);
+    this.played.emit(false);
   }
 
   play() {
-    this.played.next(true);
+    this.played.emit(true);
   }
 
   muteAudio() {
     this.audioVolumeTmp = this.audioVolume;
     this.audioVolume = 0;
-    this.audioVolumeChanged.next(this.audioVolume);
+    this.audioVolumeChanged.emit(this.audioVolume);
   }
 
   unmuteAudio() {
     this.audioVolume = this.audioVolumeTmp;
-    this.audioVolumeChanged.next(this.audioVolume);
+    this.audioVolumeChanged.emit(this.audioVolume);
   }
 
   onVolumeChange(event) {
-    this.audioVolumeChanged.next(event.value);
+    this.audioVolumeChanged.emit(event.value);
   }
 
 }

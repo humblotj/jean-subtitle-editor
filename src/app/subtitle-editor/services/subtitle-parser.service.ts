@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import * as subsrt from 'subsrt';
+import * as assCompiler from 'ass-compiler';
 
 @Injectable({
   providedIn: 'root'
@@ -172,6 +174,73 @@ export class SubtitleParserService {
 
     // hours + minutes + seconds + ms
     return +parts[1] * 3600000 + +parts[2] * 60000 + +parts[3] * 1000 + ms;
+  }
+
+  build(srt: { id: number, start: number, end: number, text: string }[], extensionExport: string) {
+    switch (extensionExport) {
+      case 'mss':
+        return this.buildMss(srt);
+      case 'ass':
+        return this.buildAss(srt);
+      default:
+        return subsrt.build(srt, { format: extensionExport });
+    }
+  }
+
+  private buildMss(srt: { id: number, start: number, end: number, text: string }[]) {
+    // const defaultSize = this.style['tag']['{t0}'].fontSize;
+    // const defaultColor = this.getColor(this.style['tag']['{t0}'].color);
+    // // tslint:disable-next-line: max-line-length
+    // let text = '[Script Info]\nMglish\nhttp://www.mglish.com/\nPlayResX: 0\nPlayResY: 0\nWrapStyle: 0\nScaledBorderAndShadow: no\nYCbCr Matrix: TV.601\n\n[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Default,a타이틀고딕,' + defaultSize + ',' + defaultColor + ',&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,' + (this.style['whiteBackground'] ? '0,0,1,2,0' : '1,0,3,28,0') + ',2,' + this.style.marginLeft + ',' + this.style.marginRight + ',' + this.style.marginVertical + ',1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n';
+    // for (let i = 0; i < srt.length; i++) {
+    //   let newLine = 'Dialogue: 0,';
+    //   newLine += this.msToTimeWithHour(srt[i].start) + ',';
+    //   newLine += this.msToTimeWithHour(srt[i].end) + ',';
+    //   newLine += 'Default,,0000,0000,0000,,';
+    //   newLine += srt[i].text.replace(/\n/gi, '\\N') + '\n';
+    //   text += newLine;
+    // }
+    // return text;
+  }
+
+  private buildAss(srt: { id: number, start: number, end: number, text: string }[]) {
+    // const defaultSize = this.style['tag']['{t0}'].fontSize;
+    // const defaultColor = this.getColor(this.style['tag']['{t0}'].color);
+    // const defaultBold = this.style['tag']['{t0}'].bold ? -1 : 0;
+    // const opaqueBox = this.style['opaqueBox'];
+    // const outline = this.style['outline'];
+    // const shadow = this.style['shadow'];
+    // const backGroundColor = this.getColor(this.style['backGroundColor']);
+    // const spacing = this.style['spacing'];
+
+    // // tslint:disable-next-line: max-line-length
+    // let text = '[Script Info]\nMglish\nhttp://www.mglish.com/\nPlayResX: 0\nPlayResY: 0\nWrapStyle: 0\nScaledBorderAndShadow: no\nYCbCr Matrix: TV.601\n\n';
+    // // tslint:disable-next-line: max-line-length
+    // text += '[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n';
+    // // tslint:disable-next-line: max-line-length
+    // text += 'Style: Default,a타이틀고딕,' + defaultSize + ',' + defaultColor + ',&H000000FF,' + backGroundColor + ',' + backGroundColor + ',' + defaultBold + ',0,0,0,100,100,' + spacing + ',0,' + opaqueBox + ',' + outline + ',' + shadow + ',2,' + this.style.marginLeft + ',' + this.style.marginRight + ',' + this.style.marginVertical + ',1' + '\n';
+    // // tslint:disable-next-line: max-line-length
+    // text += 'Style: t0,a타이틀고딕,' + defaultSize + ',' + defaultColor + ',&H000000FF,' + backGroundColor + ',' + backGroundColor + ',' + defaultBold + ',0,0,0,100,100,' + spacing + ',0,' + opaqueBox + ',' + outline + ',' + shadow + ',2,' + this.style.marginLeft + ',' + this.style.marginRight + ',' + this.style.marginVertical + ',1' + '\n';
+    // // tslint:disable-next-line: max-line-length
+    // text += 'Style: t1,a타이틀고딕,' + this.style['tag']['{t1}'].fontSize + ',' + this.getColor(this.style['tag']['{t1}'].color) + ',&H000000FF,' + backGroundColor + ',' + backGroundColor + ',' + (this.style['tag']['{t1}'].bold ? -1 : 0) + ',0,0,0,100,100,' + spacing + ',0,' + opaqueBox + ',' + outline + ',' + shadow + ',2,' + this.style.marginLeft + ',' + this.style.marginRight + ',' + this.style.marginVertical + ',1' + '\n';
+    // // tslint:disable-next-line: max-line-length
+    // text += 'Style: t2,a타이틀고딕,' + this.style['tag']['{t2}'].fontSize + ',' + this.getColor(this.style['tag']['{t2}'].color) + ',&H000000FF,' + backGroundColor + ',' + backGroundColor + ',' + (this.style['tag']['{t2}'].bold ? -1 : 0) + ',0,0,0,100,100,' + spacing + ',0,' + opaqueBox + ',' + outline + ',' + shadow + ',2,' + this.style.marginLeft + ',' + this.style.marginRight + ',' + this.style.marginVertical + ',1' + '\n';
+    // // tslint:disable-next-line: max-line-length
+    // text += 'Style: t3,a타이틀고딕,' + this.style['tag']['{t3}'].fontSize + ',' + this.getColor(this.style['tag']['{t3}'].color) + ',&H000000FF,' + backGroundColor + ',' + backGroundColor + ',' + (this.style['tag']['{t3}'].bold ? -1 : 0) + ',0,0,0,100,100,' + spacing + ',0,' + opaqueBox + ',' + outline + ',' + shadow + ',2,' + this.style.marginLeft + ',' + this.style.marginRight + ',' + this.style.marginVertical + ',1' + '\n';
+    // // tslint:disable-next-line: max-line-length
+    // text += 'Style: chunk,a타이틀고딕,' + this.style['tag']['chunk'].fontSize + ',' + this.getColor(this.style['tag']['chunk'].color) + ',&H000000FF,' + backGroundColor + ',' + backGroundColor + ',' + (this.style['tag']['chunk'].bold ? -1 : 0) + ',0,0,0,100,100,' + spacing + ',0,' + opaqueBox + ',' + outline + ',' + shadow + ',2,' + this.style.marginLeft + ',' + this.style.marginRight + ',' + this.style.marginVertical + ',1' + '\n';
+    // text += '\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n';
+    // console.log(text);
+    // for (let i = 0; i < srt.length; i++) {
+    //   let newLine = 'Dialogue: 0,';
+    //   newLine += this.msToTimeWithHour(srt[i].start) + ',';
+    //   newLine += this.msToTimeWithHour(srt[i].end) + ',';
+    //   newLine += 'Default,,0000,0000,0000,,';
+    //   // newLine += this.applyAssStyle2(srt[i].text).replace(/\n/gi, '\\N') + '\n';
+    //   newLine += this.addMitre(this.applyAssStyle2(srt[i].text)) + '\n';
+    //   text += newLine;
+    // }
+    // return text;
   }
 
 }

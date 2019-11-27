@@ -61,16 +61,9 @@ export class AudiovizualizerComponent implements OnInit, OnChanges {
     });
 
     wavesurfer.on('interaction', e => {
-      this.seekTo.next(e * 100);
+      this.seekTo.emit(e * 100);
     });
 
-    this.wavesurferInitialized.next(wavesurfer);
+    this.wavesurferInitialized.emit(wavesurfer);
   }
-
-  onZoomChange(event) {
-  }
-
-  onRateSelected(event) {
-  }
-
 }
