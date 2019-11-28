@@ -22,11 +22,18 @@ export class SubtitleEditorComponent implements OnInit {
   videoType = '';
   subtitleList: string[] = [];
 
+  private repeatTimeout = null;
+  private regions = [];
+  private adjacentTimeTmp: any = {}; // save adjacent timestamp for resizing purpose
+  private adjacentTimeUpdated = false;
+  private labelSelected = 'original text';
+
   @ViewChild(CdkVirtualScrollViewport, { static: false }) viewPort: CdkVirtualScrollViewport;
   timeStamp: { startMs: number, endMs: number }[] = [];
   script: { text: string }[] = [];
   scriptTranslation: { text: string }[] = [];
-  indexActive = null;
+  indexActive: number = null;
+  previousIndexActive: number = null;
 
   constructor(private http: HttpClient,
     private dataStorageService: DataStorageService,
@@ -91,6 +98,7 @@ export class SubtitleEditorComponent implements OnInit {
   }
 
   subtitleSelected(data: any) {
+    this.previousIndexActive = null;
     this.indexActive = null;
     this.timeStamp = data.map((line: any) => ({ startMs: line.startTime, endMs: line.endTime }));
     const script = this.getFullText(data).split('\r\n').map((text: string) => ({ text }));
@@ -104,6 +112,7 @@ export class SubtitleEditorComponent implements OnInit {
     this.indexActive = 0;
     this.script = script;
     this.scriptTranslation = scriptTranslation;
+    this.loadRegions();
   }
 
   translationSelected(data: any) {
@@ -124,6 +133,7 @@ export class SubtitleEditorComponent implements OnInit {
       this.script = script;
     }
     this.scriptTranslation = scriptTranslation;
+    this.loadRegions();
   }
 
   getFullText(srt: any) {
@@ -201,12 +211,90 @@ export class SubtitleEditorComponent implements OnInit {
 
   wavesurferInitialized(wavesurfer: any) {
     this.wavesurfer = wavesurfer;
+    this.wavesurfer.on('loading', (e) => {
+      if (e === 100) {
+        this.timeoutLoadRegions();
+      }
+    });
+    this.wavesurfer.on('region-updated', (e) => {
+      this.timeStamp[e.id].startMs = Math.floor(e.start * 100) * 10;
+      this.timeStamp[e.id].endMs = Math.floor(e.end * 100) * 10;
+
+      // save adjacent timestamp for resizing purpose
+      if (this.adjacentTimeUpdated === false) {
+        if (e.id !== this.timeStamp.length - 1) {
+          this.adjacentTimeTmp.start = this.timeStamp[e.id + 1].startMs;
+        }
+        if (e.id !== 0) {
+          this.adjacentTimeTmp.end = this.timeStamp[e.id - 1].endMs;
+        }
+        this.adjacentTimeUpdated = true;
+      }
+    });
+
+    this.wavesurfer.on('region-update-end', () => {
+      this.adjacentTimeUpdated = false;
+    });
+
+    this.wavesurfer.on('region-click', (event) => {
+      if (event.id !== this.indexActive) {
+        this.setIndexActive(event.id);
+        this.pause();
+
+        if (this.previousIndexActive !== null && this.previousIndexActive !== event.id &&
+          typeof this.wavesurfer.regions.list[this.previousIndexActive] !== 'undefined') {
+          this.wavesurfer.regions.list[this.previousIndexActive].unAll();
+          this.wavesurfer.regions.list[this.previousIndexActive].remove();
+
+          this.addRegion(this.previousIndexActive, false,
+            this.previousIndexActive % 2 === 0 ? 'rgba(0,0,128,.1)' : 'hsla(100, 100%, 30%, 0.1)');
+        }
+        if (typeof this.wavesurfer.regions.list[event.id] !== 'undefined') {
+          this.wavesurfer.regions.list[event.id].remove();
+          this.addRegionActive(event.id);
+        }
+
+        const progress = this.timeStamp[event.id].startMs / 1000 / this.player.duration();
+        this.seekTo(progress);
+      }
+    });
+
+    this.wavesurfer.on('region-in', (event) => {
+      if (event.id !== this.indexActive && this.repeatTimeout === null) {
+        if (this.timeStamp[event.id].startMs - this.timeStamp[this.indexActive].startMs > 300) {
+          this.wavesurfer.regions.list[this.indexActive].remove();
+          this.addRegion(this.indexActive, false,
+            this.indexActive % 2 === 0 ? 'rgba(0,0,128,.1)' : 'hsla(100, 100%, 30%, 0.1)');
+          if (typeof this.wavesurfer.regions.list[event.id] !== 'undefined') {
+            this.wavesurfer.regions.list[event.id].remove();
+          }
+          this.addRegionActive(event.id);
+          this.setIndexActive(event.id);
+        }
+      }
+    });
+  }
+
+  setIndexActive(index: number) {
+    this.previousIndexActive = this.indexActive;
+    this.indexActive = index;
   }
 
   seekTo(progress: number) {
     const time = this.player.duration() * progress / 100;
     this.player.currentTime(time);
     this.wavesurfer.seekAndCenter(progress / 100);
+  }
+
+  pause() {
+    clearTimeout(this.repeatTimeout);
+    this.repeatTimeout = null;
+    if (this.player) {
+      this.player.pause();
+    }
+    if (this.wavesurfer) {
+      this.wavesurfer.pause();
+    }
   }
 
   onPlayButton(play: boolean) {
@@ -234,5 +322,147 @@ export class SubtitleEditorComponent implements OnInit {
     }
     this.subtitleList = [];
   }
+
+  private timeoutLoadRegions() {
+    if (this.wavesurfer.isReady) {
+      if (this.timeStamp.length) {
+        this.loadRegions();
+      }
+    } else {
+      setTimeout(() => this.timeoutLoadRegions(), 1000);
+    }
+  }
+
+  loadRegions() {
+    this.wavesurfer.clearRegions();
+    for (let i = 0; i < this.timeStamp.length; i++) {
+      if (i !== this.indexActive) {
+        this.addRegion(i, false, i % 2 === 0 ? 'rgba(0,0,128,.1)' : 'hsla(100, 100%, 30%, 0.1)');
+      }
+    }
+    this.addRegionActive(this.indexActive);
+  }
+
+  addRegion(id: number, resize: boolean, color: string) {
+    const duration = this.wavesurfer.getDuration();
+    if (this.timeStamp[id].endMs / 1000 < duration) {
+      switch (this.labelSelected) {
+        case 'none':
+          this.wavesurfer.addRegion({
+            id,
+            start: this.timeStamp[id].startMs / 1000,
+            end: this.timeStamp[id].endMs / 1000,
+            drag: false,
+            resize,
+            color,
+            attributes: {
+              id: id + 1
+            }
+          });
+          break;
+        case 'original text':
+          this.wavesurfer.addRegion({
+            id,
+            start: this.timeStamp[id].startMs / 1000,
+            end: this.timeStamp[id].endMs / 1000,
+            drag: false,
+            resize,
+            color,
+            attributes: {
+              id: (id + 1),
+              top: this.script[id].text.replace(/\{(.*?)\}|\|/gi, ''),
+            }
+          });
+          break;
+        case 'translation':
+          this.wavesurfer.addRegion({
+            id,
+            start: this.timeStamp[id].startMs / 1000,
+            end: this.timeStamp[id].endMs / 1000,
+            drag: false,
+            resize,
+            color,
+            attributes: {
+              id: (id + 1),
+              top: this.scriptTranslation[id].text.replace(/\{(.*?)\}|\|/gi, '')
+            }
+          });
+          break;
+        case 'both':
+          this.wavesurfer.addRegion({
+            id,
+            start: this.timeStamp[id].startMs / 1000,
+            end: this.timeStamp[id].endMs / 1000,
+            drag: false,
+            resize,
+            color,
+            attributes: {
+              id: (id + 1),
+              top: this.script[id].text.replace(/\{(.*?)\}|\|/gi, ''),
+              bottom: this.scriptTranslation[id].text.replace(/\{(.*?)\}|\|/gi, '')
+            }
+          });
+          break;
+      }
+      if (typeof this.timeStamp[id - 1] !== 'undefined') {
+        if (this.timeStamp[id - 1].startMs === this.timeStamp[id].startMs) {
+          this.wavesurfer.regions.list[id].element.className += ' overlapped';
+        } else {
+          if (this.wavesurfer.regions.list[id].element.classList.contains('overlapped')) {
+            this.wavesurfer.regions.list[id].element.classList.remove('overlapped');
+          }
+        }
+      }
+    }
+  }
+
+  addRegionActive(id: number) {
+    this.addRegion(id, true, 'hsla(360, 100%, 50%, 0.3)');
+    this.wavesurfer.regions.list[id].element.style.zIndex = 3;
+
+    const that = this;
+    this.wavesurfer.regions.list[id].onResize = function (delta, direction) {
+      // re-implement existing functionality so interface updates work
+      if (direction === 'start') {
+        this.update({
+          start: Math.min(this.start + delta, this.end),
+          end: Math.max(this.start + delta, this.end)
+        });
+      } else {
+        this.update({
+          start: Math.min(this.end + delta, this.start),
+          end: Math.max(this.end + delta, this.start)
+        });
+      }
+      // resize the region adjacent to this one
+      that.resizeAdjacent(this, direction);
+    };
+    this.regions = [];
+    if (id !== 0) {
+      this.regions.push(this.wavesurfer.regions.list[id - 1]);
+    }
+    this.regions.push(this.wavesurfer.regions.list[id]);
+    if (id !== this.timeStamp.length - 1) {
+      this.regions.push(this.wavesurfer.regions.list[id + 1]);
+    }
+  }
+
+  private resizeAdjacent(obj, direction) {
+    const index = this.regions.indexOf(obj);
+    if (direction === 'start' && index > 0) {
+      if (this.adjacentTimeTmp.end > obj.start * 1000) {
+        this.regions[index - 1].update({
+          end: obj.start
+        });
+      }
+    } else if (direction === 'end') {
+      if (this.adjacentTimeTmp.start < obj.end * 1000) {
+        this.regions[index + 1].update({
+          start: obj.end
+        });
+      }
+    }
+  }
+
 
 }

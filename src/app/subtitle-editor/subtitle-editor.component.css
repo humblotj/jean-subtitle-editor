@@ -10,3 +10,71 @@
   display: flex;
   width: 320px;
 }
+
+::ng-deep .wavesurfer-region {
+  height: 144px !important;
+  top: 10px !important;
+}
+
+::ng-deep .wavesurfer-handle {
+  width: 10px !important;
+  max-width: 10px !important;
+  border: 1px solid #ddd;
+  background: rgba(255, 0, 0, 0.5);
+  box-sizing: border-box;
+  z-index: 3;
+}
+
+::ng-deep .wavesurfer-handle-start {
+  left: -10px !important;
+}
+
+::ng-deep .wavesurfer-handle-end {
+  margin-left: -10px;
+  left: calc(100% + 10px) !important;
+}
+
+::ng-deep .wavesurfer-handle:before,
+::ng-deep .wavesurfer-handle:after {
+  content: '';
+  display: block;
+  position: absolute;
+  z-index: 1;
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  height: 4px;
+  left: 5%;
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+::ng-deep .wavesurfer-handle:before {
+  margin-top: -3px;
+}
+
+::ng-deep mat-form-field.playbackRate {
+  width: 80px;
+}
+
+::ng-deep mat-form-field.label {
+  width: 102px;
+}
+
+::ng-deep region.wavesurfer-region:before {
+  content: attr(data-region-id);
+  position: absolute;
+  top: -12px;
+  font-size: 12px;
+}
+
+::ng-deep region.wavesurfer-region.overlapped:before {
+  left: 15px;
+}
+
+::ng-deep region.wavesurfer-region:after {
+  content: attr(data-region-top);
+  position: absolute;
+  top: 0;
+  font-size: 12px;
+}

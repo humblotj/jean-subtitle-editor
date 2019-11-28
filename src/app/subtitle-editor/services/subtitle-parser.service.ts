@@ -43,7 +43,6 @@ export class SubtitleParserService {
         text: data[i + 3].trim().replace(/(\r\n|\n|\r)/gm, ' '),
       });
     }
-    console.log(items);
     return items;
   }
 
@@ -174,6 +173,36 @@ export class SubtitleParserService {
 
     // hours + minutes + seconds + ms
     return +parts[1] * 3600000 + +parts[2] * 60000 + +parts[3] * 1000 + ms;
+  }
+
+  msToTime(duration: number) {
+    let milliseconds = Math.floor((duration % 1000) / 10) + '';
+    let seconds = Math.floor((duration / 1000) % 60) + '';
+    let minutes = Math.floor((duration / (1000 * 60)) % 60) + '';
+
+    minutes = (+minutes < 10) ? '0' + minutes : minutes;
+    seconds = (+seconds < 10) ? '0' + seconds : seconds;
+    milliseconds = (+milliseconds < 10) ? '0' + milliseconds : milliseconds;
+
+    return minutes + ':' + seconds + '.' + milliseconds;
+  }
+
+  timeToMs(val: string) {
+    const regex = /(\d+):(\d{2}).(\d{2})/;
+    const parts = regex.exec(val);
+
+    if (parts === null) {
+      return 0;
+    }
+
+    for (let i = 1; i < 5; i++) {
+      parts[i] = parseInt(parts[i], 10) + '';
+      if (isNaN(+parts[i])) {
+        parts[i] = 0 + '';
+      }
+    }
+    // minutes + seconds + cs
+    return +parts[1] * 60000 + +parts[2] * 1000 + +parts[3] * 10;
   }
 
   build(srt: { id: number, start: number, end: number, text: string }[], extensionExport: string) {

@@ -1,5 +1,7 @@
 import { Component, OnInit, Input, SimpleChanges, OnChanges } from '@angular/core';
 
+import { SubtitleParserService } from '../services/subtitle-parser.service';
+
 @Component({
   selector: 'app-script-line',
   templateUrl: './script-line.component.html',
@@ -16,31 +18,18 @@ export class ScriptLineComponent implements OnInit, OnChanges {
   startTime = '';
   endTime = '';
 
-  constructor() { }
+  constructor(private subtitleParserService: SubtitleParserService) { }
 
   ngOnInit() {
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.startMs) {
-      this.startTime = this.msToTime(this.startMs);
+      this.startTime = this.subtitleParserService.msToTime(this.startMs);
     }
     if (changes.endMs) {
-      this.endTime = this.msToTime(this.endMs);
+      this.endTime = this.subtitleParserService.msToTime(this.endMs);
     }
   }
-
-  msToTime(duration: number) {
-    let milliseconds = Math.floor((duration % 1000) / 10) + '';
-    let seconds = Math.floor((duration / 1000) % 60) + '';
-    let minutes = Math.floor((duration / (1000 * 60)) % 60) + '';
-
-    minutes = (+minutes < 10) ? '0' + minutes : minutes;
-    seconds = (+seconds < 10) ? '0' + seconds : seconds;
-    milliseconds = (+milliseconds < 10) ? '0' + milliseconds : milliseconds;
-
-    return minutes + ':' + seconds + '.' + milliseconds;
-  }
-
 
 }
