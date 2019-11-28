@@ -1,5 +1,81 @@
 <mat-toolbar>
   <mat-tab-group mat-align-tabs="start">
+
+    <mat-tab label="Subtitle">
+      <div fxLayoutAlign="start stretch">
+        <div>
+          <button mat-button [matMenuTriggerFor]="menu">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="subtitles-outline" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Select Subtitle</span>
+            </div>
+          </button>
+          <mat-menu #menu="matMenu">
+            <input hidden (change)="onSubtitleFileSelected($event)" #subtitleInput type="file"
+              accept=".srt,.sbv,.ass, .mss, .txt, .xlsx">
+            <button mat-menu-item (click)="subtitleInput.click();subtitleInput.value=null"
+              matTooltip="format supported: .srt,.sbv,.ass, .mss, .txt, .xlsx">
+              <mat-icon svgIcon="folder"></mat-icon>
+              <span>from files</span>
+            </button>
+            <button mat-menu-item disabled="true">
+              <mat-icon svgIcon="text-to-speech"></mat-icon>
+              <span>generate from audio</span>
+            </button>
+            <button mat-menu-item *ngFor="let subtitle of subtitleList" (click)="onSubtitleSelected(subtitle)">
+              {{subtitle.lang_translated}}
+            </button>
+          </mat-menu>
+          <button mat-button [matMenuTriggerFor]="menuTranslation">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="subtitles" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Select Translation</span>
+            </div>
+          </button>
+          <mat-menu #menuTranslation="matMenu">
+            <input hidden (change)="onTranslationFileSelected($event)" #translationInput type="file"
+              accept=".srt,.sbv,.ass,.mss,.txt">
+            <button mat-menu-item (click)="translationInput.click();translationInput.value=null"
+              matTooltip="format supported: .srt,.sbv,.ass,.mss,.txt">
+              <mat-icon svgIcon="folder"></mat-icon>
+              <span>from files</span>
+            </button>
+            <button mat-menu-item *ngFor="let subtitle of subtitleList" (click)="onTranslationSelected(subtitle)">
+              {{subtitle.lang_translated}}
+            </button>
+          </mat-menu>
+        </div>
+        <mat-divider [vertical]="true"></mat-divider>
+        <div fxLayoutAlign="center center" style="margin-right: 12px;">
+          <button mat-button (click)="onTranslate()">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="translate" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Translate</span>
+            </div>
+          </button>
+          <mat-form-field [style.width.px]="100">
+            <mat-select [(value)]="sourceLanguage" (focus)="setOldSourceLanguage()"
+              (selectionChange)="onSLSelected($event)">
+              <mat-option *ngFor="let language of languagesSupported" [value]="language.value">
+                {{language.viewValue}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <button mat-icon-button (click)="swapLanguages()">
+            <mat-icon svgIcon="swap-horizontal"></mat-icon>
+          </button>
+          <mat-form-field [style.width.px]="100">
+            <mat-select [(value)]="targetLanguage" (focus)="setOldTargetLanguage()"
+              (selectionChange)="onTLSelected($event)">
+              <mat-option *ngFor="let language of languagesSupported" [value]="language.value">
+                {{language.viewValue}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <mat-divider [vertical]="true"></mat-divider>
+      </div>
+    </mat-tab>
     <mat-tab label="Video">
       <div fxLayoutAlign="start stretch">
         <input hidden (change)="onOpenVideo($event)" #videoInput type="file"
@@ -29,48 +105,6 @@
         </button>
         <mat-divider [vertical]="true"></mat-divider>
       </div>
-    </mat-tab>
-    <mat-tab label="Subtitle">
-      <button mat-button [matMenuTriggerFor]="menu">
-        <div fxLayout="column" fxLayoutAlign="center center">
-          <mat-icon svgIcon="subtitles-outline" style="margin-top: 8px;"></mat-icon>
-          <span style="font-size: smaller;margin-top: -10px;">Select Subtitle</span>
-        </div>
-      </button>
-      <mat-menu #menu="matMenu">
-        <input hidden (change)="onSubtitleFileSelected($event)" #subtitleInput type="file"
-          accept=".srt,.sbv,.ass, .mss, .txt, .xlsx">
-        <button mat-menu-item (click)="subtitleInput.click();subtitleInput.value=null"
-          matTooltip="format supported: .srt,.sbv,.ass, .mss, .txt, .xlsx">
-          <mat-icon svgIcon="folder"></mat-icon>
-          <span>from files</span>
-        </button>
-        <button mat-menu-item (click)="onOpenStt()" disabled="true">
-          <mat-icon svgIcon="text-to-speech"></mat-icon>
-          <span>generate from audio</span>
-        </button>
-        <button mat-menu-item *ngFor="let subtitle of subtitleList" (click)="onSubtitleSelected(subtitle)">
-          {{subtitle.lang_translated}}
-        </button>
-      </mat-menu>
-      <button mat-button [matMenuTriggerFor]="menuTranslation">
-        <div fxLayout="column" fxLayoutAlign="center center">
-          <mat-icon svgIcon="subtitles" style="margin-top: 8px;"></mat-icon>
-          <span style="font-size: smaller;margin-top: -10px;">Select Translation</span>
-        </div>
-      </button>
-      <mat-menu #menuTranslation="matMenu">
-        <input hidden (change)="onTranslationFileSelected($event)" #translationInput type="file"
-          accept=".srt,.sbv,.ass,.mss,.txt">
-        <button mat-menu-item (click)="translationInput.click();translationInput.value=null"
-          matTooltip="format supported: .srt,.sbv,.ass,.mss,.txt">
-          <mat-icon svgIcon="folder"></mat-icon>
-          <span>from files</span>
-        </button>
-        <button mat-menu-item *ngFor="let subtitle of subtitleList" (click)="onTranslationSelected(subtitle)">
-          {{subtitle.lang_translated}}
-        </button>
-      </mat-menu>
     </mat-tab>
     <mat-tab label="Third"> Content 3 </mat-tab>
   </mat-tab-group>

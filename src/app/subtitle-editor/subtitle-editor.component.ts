@@ -2,9 +2,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { take } from 'rxjs/operators';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import * as xml2js from 'xml2js';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 
 import { DataStorageService } from './services/data-storage.service';
-import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { ToolsService } from './services/tools.service';
+import { TranslateService } from './services/translate.service';
 
 @Component({
   selector: 'app-subtitle-editor',
@@ -20,10 +22,14 @@ export class SubtitleEditorComponent implements OnInit {
 
   @ViewChild(CdkVirtualScrollViewport, { static: false }) viewPort: CdkVirtualScrollViewport;
   timeStamp: { startMs: number, endMs: number }[] = [];
-  script: { sentence: string }[] = [];
-  scriptTranslation: { sentence: string }[] = [];
+  script: { text: string }[] = [];
+  scriptTranslation: { text: string }[] = [];
+  indexActive = null;
 
-  constructor(private http: HttpClient, private dataStorageService: DataStorageService) { }
+  constructor(private http: HttpClient,
+    private dataStorageService: DataStorageService,
+    private toolsService: ToolsService,
+    private translateService: TranslateService) { }
 
   ngOnInit() {
   }
@@ -82,28 +88,34 @@ export class SubtitleEditorComponent implements OnInit {
   }
 
   subtitleSelected(data: any) {
+    this.indexActive = null;
     this.timeStamp = data.map((line: any) => ({ startMs: line.startTime, endMs: line.endTime }));
-    this.script = this.getFullText(data).split('\r\n').map((sentence: string) => ({ sentence }));
+    const script = this.getFullText(data).split('\r\n').map((text: string) => ({ text }));
+    for (let i = script.length; i < this.timeStamp.length; i++) {
+      script[i] = { text: '' };
+    }
     const scriptTranslation = [];
     for (let i = 0; i < this.timeStamp.length; i++) {
-      scriptTranslation[i] = { sentence: '' };
+      scriptTranslation[i] = { text: '' };
     }
+    this.indexActive = 0;
+    this.script = script;
     this.scriptTranslation = scriptTranslation;
   }
 
   translationSelected(data: any) {
     const timeStamp = data.map((line: any) => ({ startMs: line.startTime, endMs: line.endTime }));
-    const scriptTranslation = this.getFullText(data).split('\r\n').map((sentence: string) => ({ sentence }));
+    const scriptTranslation = this.getFullText(data).split('\r\n').map((text: string) => ({ text }));
     if (timeStamp.length < this.timeStamp.length) {
       for (let i = timeStamp.length; i < this.timeStamp.length; i++) {
-        scriptTranslation[i] = { sentence: '' };
+        scriptTranslation[i] = { text: '' };
       }
     } else if (timeStamp.length > this.timeStamp.length) {
       const script = this.script.slice();
       const timeStampTmp = this.timeStamp.slice();
       for (let i = this.timeStamp.length; i < timeStamp.length; i++) {
         timeStampTmp[i] = timeStamp[i];
-        script[i] = { sentence: '' };
+        script[i] = { text: '' };
       }
       this.timeStamp = timeStampTmp;
       this.script = script;
@@ -113,6 +125,30 @@ export class SubtitleEditorComponent implements OnInit {
 
   getFullText(srt: any) {
     return srt.map(line => line.text).join('\r\n');
+  }
+
+  translate(lang: { sourceLanguage: string, targetLanguage: string }) {
+    if (this.script.length === 0) {
+      this.toolsService.openSnackBar('Select Subtitle First', 2000);
+    } else {
+      let scriptTranslation = [];
+      for (let i = 0; i < this.timeStamp.length; i++) {
+        scriptTranslation[i] = { text: '' };
+      }
+      this.scriptTranslation = scriptTranslation;
+      const fullText = this.script.map(line => line.text).join('\r\n')
+        .replace(/(?<!\r)\n/g, ' ').replace(/\{(.*?)\}|\|/gi, '');
+      this.translateService.translate(fullText, lang.sourceLanguage, lang.targetLanguage).subscribe(result => {
+        scriptTranslation = result.split('\r\n').map((text: string) => ({ text }));
+        for (let i = scriptTranslation.length; i < this.timeStamp.length; i++) {
+          scriptTranslation[i] = { text: '' };
+        }
+        this.scriptTranslation = scriptTranslation;
+      },
+        err => {
+          console.error(err);
+        });
+    }
   }
 
   playerInitialized(player: any) {

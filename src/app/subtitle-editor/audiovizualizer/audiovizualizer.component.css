@@ -1,12 +1,3 @@
-.waveform {
-  height: 100px;
-  overflow: visible;
-}
-
-.waveform wave {
-  height: 100px!important;
-}
-
 .hidden {
   display: none;
 }

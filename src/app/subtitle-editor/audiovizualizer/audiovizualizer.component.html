@@ -5,7 +5,7 @@
     <mat-icon svgIcon="magnify-plus-outline"></mat-icon>
   </div> -->
   <div *ngIf="progressRate!==100" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" style="padding: 12px;">
-    <mat-spinner [diameter]="30" *ngIf="!failed" [ngClass]="{'invisible':!inProgressLocal}">
+    <mat-spinner [diameter]="30">
     </mat-spinner>
     <span>{{progressRate}}%</span>
   </div>

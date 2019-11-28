@@ -12,7 +12,6 @@ import { MatIconRegistry } from '@angular/material';
 
 import { SubtitleEditorModule } from './subtitle-editor/subtitle-editor.module';
 import { WildcardRoutingModule } from './wildcard-routing.module';
-import { SharedModule } from './shared/shared.module';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -23,7 +22,6 @@ import { environment } from '../environments/environment';
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    SharedModule.forRoot(),
     SubtitleEditorModule,
     WildcardRoutingModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),

@@ -24,12 +24,4 @@ import { MaterialModule } from './material/material.module';
   ]
 })
 
-export class SharedModule {
-  static forRoot(): ModuleWithProviders {
-    return {
-      ngModule: SharedModule,
-      providers: [
-      ]
-    };
-  }
-}
+export class SharedModule { }

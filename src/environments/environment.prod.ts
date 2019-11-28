@@ -7,5 +7,6 @@ export const environment = {
     projectId: 'phototranslatortest',
     storageBucket: 'phototranslatortest.appspot.com',
     messagingSenderId: '765497853388'
-  }
+  },
+  googleAPIKey: 'AIzaSyD-UaCYKoMx8etVNrsYEr2hrep44vu5BgI',
 };

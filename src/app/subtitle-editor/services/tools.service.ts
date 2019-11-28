@@ -32,7 +32,7 @@ export class ToolsService {
     }
     document.execCommand('copy');
     el.setSelectionRange(0, 0);
-    this.openSnackBar('Copied to clipboard', 1000);
+    this.openSnackBar('Copied to clipboard', 2000);
   }
 
   openSnackBar(message: string, duration: number) {

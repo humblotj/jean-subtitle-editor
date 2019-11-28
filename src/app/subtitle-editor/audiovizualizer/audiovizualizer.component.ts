@@ -30,7 +30,7 @@ export class AudiovizualizerComponent implements OnInit, OnChanges {
   loadWafeSurfer() {
     const wavesurfer = WaveSurfer.create({
       container: '#waveform',
-      height: 158,
+      height: 100,
       barHeight: 0.6,
       scrollParent: true,
       partialRender: false,

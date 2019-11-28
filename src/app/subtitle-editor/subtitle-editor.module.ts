@@ -9,13 +9,15 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
 import { AudiovizualizerComponent } from './audiovizualizer/audiovizualizer.component';
 import { ScriptLineComponent } from './script-line/script-line.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { ScriptEditComponent } from './script-edit/script-edit.component';
 
 @NgModule({
   declarations: [SubtitleEditorComponent,
     SidenavEmbedVideoComponent,
     ToolbarComponent,
     AudiovizualizerComponent,
-    ScriptLineComponent
+    ScriptLineComponent,
+    ScriptEditComponent
   ],
   imports: [
     SharedModule,

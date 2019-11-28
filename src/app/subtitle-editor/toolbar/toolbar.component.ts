@@ -15,10 +15,23 @@ export class ToolbarComponent implements OnInit {
   @Output() yTLinkPlayed: EventEmitter<string> = new EventEmitter();
   @Output() subtitleSelected: EventEmitter<any> = new EventEmitter();
   @Output() translationSelected: EventEmitter<any> = new EventEmitter();
-  @Input() subtitleList: string[];
+  @Output() translate: EventEmitter<{ sourceLanguage: string, targetLanguage: string }> = new EventEmitter();
+  @Input() subtitleList: { name: string, lang_code: string, lang_translated: string }[];
 
   youtubeLink = '';
   private videoId = '';
+
+  languagesSupported = [
+    { value: 'ko', viewValue: 'Korean' },
+    { value: 'en', viewValue: 'English' },
+    { value: 'zh-cn', viewValue: 'Chinese (Simplified)' },
+    { value: 'zh-tw', viewValue: 'Chinese (Traditional)' },
+    { value: 'ja', viewValue: 'Japanese' },
+  ];
+  sourceLanguage = 'en';
+  targetLanguage = 'ko';
+  private oldSourceLanguage = '';
+  private oldTargetLanguage = '';
 
   constructor(private toolsService: ToolsService, private subtitleParserService: SubtitleParserService, private http: HttpClient) { }
 
@@ -46,7 +59,7 @@ export class ToolbarComponent implements OnInit {
       }
       this.yTLinkPlayed.next(this.videoId);
     } else {
-      this.toolsService.openSnackBar('This is not a YouTube link.', 1000);
+      this.toolsService.openSnackBar('This is not a YouTube link.', 2000);
     }
   }
 
@@ -121,5 +134,34 @@ export class ToolbarComponent implements OnInit {
       error => {
         console.error(error);
       });
+  }
+
+  onTranslate() {
+    this.translate.next({ sourceLanguage: this.sourceLanguage, targetLanguage: this.targetLanguage });
+  }
+
+  setOldTargetLanguage() {
+    this.oldTargetLanguage = this.targetLanguage;
+  }
+
+  setOldSourceLanguage() {
+    this.oldSourceLanguage = this.sourceLanguage;
+  }
+  onTLSelected(event: any) {
+    if (this.sourceLanguage === event.value) {
+      this.sourceLanguage = this.oldTargetLanguage;
+    }
+  }
+
+  onSLSelected(event: any) {
+    if (this.targetLanguage === event.value) {
+      this.targetLanguage = this.oldSourceLanguage;
+    }
+  }
+
+  swapLanguages() {
+    const tmp = this.sourceLanguage;
+    this.sourceLanguage = this.targetLanguage;
+    this.targetLanguage = tmp;
   }
 }
