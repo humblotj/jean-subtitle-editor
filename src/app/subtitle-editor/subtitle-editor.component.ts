@@ -112,7 +112,9 @@ export class SubtitleEditorComponent implements OnInit {
     this.indexActive = 0;
     this.script = script;
     this.scriptTranslation = scriptTranslation;
-    this.loadRegions();
+    if (this.wavesurfer) {
+      this.loadRegions();
+    }
   }
 
   translationSelected(data: any) {
@@ -253,9 +255,6 @@ export class SubtitleEditorComponent implements OnInit {
           this.wavesurfer.regions.list[event.id].remove();
           this.addRegionActive(event.id);
         }
-
-        const progress = this.timeStamp[event.id].startMs / 1000 / this.player.duration();
-        this.seekTo(progress);
       }
     });
 
