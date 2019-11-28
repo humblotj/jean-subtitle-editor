@@ -1,12 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { take } from 'rxjs/operators';
 import { HttpParams, HttpClient } from '@angular/common/http';
-import * as xml2js from 'xml2js';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import * as xml2js from 'xml2js';
+import * as FileSaver from 'file-saver';
 
 import { DataStorageService } from './services/data-storage.service';
 import { ToolsService } from './services/tools.service';
 import { TranslateService } from './services/translate.service';
+import { SubtitleParserService } from './services/subtitle-parser.service';
 
 @Component({
   selector: 'app-subtitle-editor',
@@ -29,7 +31,8 @@ export class SubtitleEditorComponent implements OnInit {
   constructor(private http: HttpClient,
     private dataStorageService: DataStorageService,
     private toolsService: ToolsService,
-    private translateService: TranslateService) { }
+    private translateService: TranslateService,
+    private subtitleParserService: SubtitleParserService) { }
 
   ngOnInit() {
   }
@@ -149,6 +152,47 @@ export class SubtitleEditorComponent implements OnInit {
           console.error(err);
         });
     }
+  }
+
+  export(event: { extensionExport: string, script: boolean }) {
+    let blob: Blob;
+    const text = event.script ? this.script : this.scriptTranslation;
+    switch (event.extensionExport) {
+      case 'xlsx':
+        break;
+      case 'txt':
+        blob = new Blob([text.join('\n').replace(/\{(.*?)\}|\|/gi, '')], { type: 'text/plain' });
+        break;
+      case 'ass':
+      case 'mss': {
+        const dataJSON = this.timeStamp.map((line, index: number) => {
+          return {
+            id: index,
+            start: line.startMs,
+            end: line.endMs,
+            text: text[index].text.trim()
+          };
+        });
+        const dataFile = this.subtitleParserService.build(dataJSON, event.extensionExport);
+        blob = new Blob([dataFile], { type: '.' + event.extensionExport });
+        break;
+      }
+      default: {
+        const dataJSON = this.timeStamp.map((line, index: number) => {
+          return {
+            id: index,
+            start: line.startMs,
+            end: line.endMs,
+            text: text[index].text.replace(/\{(.*?)\}/gi, '').trim()
+          };
+        });
+        const dataFile = this.subtitleParserService.build(dataJSON, event.extensionExport);
+        blob = new Blob([dataFile], { type: '.' + event.extensionExport });
+        break;
+      }
+    }
+    const lang = event.script ? 'ko' : 'en';
+    FileSaver.saveAs(blob, 'subtitle' + '_export_' + lang + '.' + event.extensionExport);
   }
 
   playerInitialized(player: any) {

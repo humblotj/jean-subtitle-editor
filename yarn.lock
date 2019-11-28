@@ -1111,10 +1111,10 @@
     lodash.camelcase "^4.3.0"
     protobufjs "^6.8.6"
 
-"@mdi/angular-material@^4.5.95":
-  version "4.5.95"
-  resolved "https://registry.yarnpkg.com/@mdi/angular-material/-/angular-material-4.5.95.tgz#2fdc9b99a540c02c154eed059c56ec6f934661d4"
-  integrity sha512-zhJ3YEvBp5vzIRq1DJi4BcdRDqjpB9lj+Go5gBdCR0qeK6MqonPFkOCsKk8o84aTRm/M4w/tmcBOJ6aa5TTliw==
+"@mdi/angular-material@^4.6.95":
+  version "4.6.95"
+  resolved "https://registry.yarnpkg.com/@mdi/angular-material/-/angular-material-4.6.95.tgz#ac5b45443ccf88a9a0550a735c3af7d504ee6bd3"
+  integrity sha512-IwBkL0QlvDjRrcZXCif34Rzhl0XuM+vGCft0s3ewg82t2jC2bktG7LfcwcyeUsjOw2jJHLhl8oWzd7zsErzXog==
 
 "@ngtools/webpack@8.3.19":
   version "8.3.19"
@@ -1246,7 +1246,7 @@
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.3.tgz#3dca0e3f33b200fc7d1139c0cd96c1268cadfd9d"
   integrity sha512-tHq6qdbT9U1IRSGf14CL0pUlULksvY9OZ+5eEgl1N7t+OA3tGvNpxJCzuKQlsNgCVwbAs670L1vcVQi8j9HjnA==
 
-"@types/node@*", "@types/node@~12.12.12":
+"@types/node@*":
   version "12.12.12"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.12.12.tgz#529bc3e73dbb35dd9e90b0a1c83606a9d3264bdb"
   integrity sha512-MGuvYJrPU0HUwqF7LqvIj50RZUX23Z+m583KBygKYUZLlZ88n6w28XRNJRJgsHukLEnLz6w6SvxZoLgbr5wLqQ==
@@ -1255,6 +1255,11 @@
   version "10.17.5"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.17.5.tgz#c1920150f7b90708a7d0f3add12a06bc9123c055"
   integrity sha512-RElZIr/7JreF1eY6oD5RF3kpmdcreuQPjg5ri4oQ5g9sq7YWU8HkfB3eH8GwAwxf5OaCh0VPi7r4N/yoTGelrA==
+
+"@types/node@~12.12.14":
+  version "12.12.14"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.12.14.tgz#1c1d6e3c75dba466e0326948d56e8bd72a1903d2"
+  integrity sha512-u/SJDyXwuihpwjXy7hOOghagLEV1KdAST6syfnOk6QZAMzZuWZqXy5aYYZbh8Jdpd4escVFP0MvftHNDb9pruA==
 
 "@types/q@^0.0.32":
   version "0.0.32"
@@ -1750,6 +1755,11 @@ asn1@~0.2.3:
   integrity sha512-jxwzQpLQjSmWXgwaCZE9Nz+glAG01yF1QnWgbhGwHI5A6FRIEY6IVqtHhIepHqI7/kyEyQEagBC5mBEFlIYvdg==
   dependencies:
     safer-buffer "~2.1.0"
+
+ass-compiler@^0.0.11:
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/ass-compiler/-/ass-compiler-0.0.11.tgz#b86676c7cfbd205aac2d6a372570f3a8af7a3971"
+  integrity sha512-daFDzLCVwG5HkG1ZxrFHRuJAq4+GBb2HRriOf1qWitdfqj8mUvUbi3e0scNTPuEdVdG4LbeWtIGYZRBJueYMcw==
 
 assert-plus@1.0.0, assert-plus@^1.0.0:
   version "1.0.0"
@@ -2768,10 +2778,10 @@ core-js@^2.4.0:
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.10.tgz#8a5b8391f8cc7013da703411ce5b585706300d7f"
   integrity sha512-I39t74+4t+zau64EN1fE5v2W31Adtc/REhzWN+gWRRXg6WH5qAsZm62DHpQ1+Yhe4047T55jvzz7MUqF/dBBlA==
 
-core-js@^3.4.2:
-  version "3.4.2"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.4.2.tgz#ee2b1a60b50388d8ddcda8cdb44a92c7a9ea76df"
-  integrity sha512-bUTfqFWtNKWp73oNIfRkqwYZJeNT3lstzZcAkhhiuvDraRSgOH1/+F9ZklbpR4zpdKuo4cpXN8tKP7s61yjX+g==
+core-js@^3.4.4:
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.4.4.tgz#e3d422f8a51adc4cae2bfa04cef26a5ccc046d29"
+  integrity sha512-vKea1DrcLA80Hrfc7AQgfoGvEaByfR5mH08t+zuWOWY94TFBmabdEL56mUbcijvadG9RxsXR2gUUFrfj4/iTcA==
 
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
@@ -3596,6 +3606,11 @@ file-loader@4.2.0:
   dependencies:
     loader-utils "^1.2.3"
     schema-utils "^2.0.0"
+
+file-saver@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/file-saver/-/file-saver-2.0.2.tgz#06d6e728a9ea2df2cce2f8d9e84dfcdc338ec17a"
+  integrity sha512-Wz3c3XQ5xroCxd1G8b7yL0Ehkf0TC9oYC6buPFkNnU9EnaPlifeAFCyCh+iewXTyFRcg0a6j3J7FmJsIhlhBdw==
 
 fileset@^2.0.3:
   version "2.0.3"
@@ -4968,7 +4983,7 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
-jszip@^3.1.3:
+jszip@^3.1.3, jszip@^3.2.2:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/jszip/-/jszip-3.2.2.tgz#b143816df7e106a9597a94c77493385adca5bd1d"
   integrity sha512-NmKajvAFQpbg3taXQXr/ccS2wcucR1AZ+NtyWp2Nq7HHVsXhcJFR8p0Baf32C2yVvBylFWVeKf+WI2AnvlPhpA==
@@ -7768,6 +7783,11 @@ stylus@0.54.5:
     mkdirp "0.5.x"
     sax "0.5.x"
     source-map "0.1.x"
+
+subsrt@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/subsrt/-/subsrt-1.1.1.tgz#079bc83921feb46e05319a3ff9a13bef08a8d388"
+  integrity sha512-F15pSRRrPYnLjDKohcwkUUGhgHH+0IqpCoznMHMibZI9a2qN3ya/p3Xp/7zFOPvwez9b/qFjwtOnyS7f7d/MNw==
 
 supports-color@^2.0.0:
   version "2.0.0"

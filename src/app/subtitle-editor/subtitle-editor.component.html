@@ -1,7 +1,11 @@
 <app-toolbar [subtitleList]="subtitleList" (videoSelected)="videoSelected($event)" (yTLinkPlayed)="yTLinkPlayed($event)"
   (subtitleSelected)="subtitleSelected($event)" (translationSelected)="translationSelected($event)"
+<<<<<<< HEAD
   (translate)="translate($event)">
 </app-toolbar>
+=======
+  (export)="expoort($event)"></app-toolbar>
+>>>>>>> dc9ed0620d513f2eb89ec280cc05f4006f3183cb
 <mat-sidenav-container class=" sidenav-container">
   <mat-sidenav mode="side" opened class="sidenav">
     <app-sidenav-embed-video [url]="url" [videoType]="videoType" (playerInitialized)="playerInitialized($event)"

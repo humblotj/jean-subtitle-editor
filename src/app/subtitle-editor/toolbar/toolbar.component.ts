@@ -16,6 +16,7 @@ export class ToolbarComponent implements OnInit {
   @Output() subtitleSelected: EventEmitter<any> = new EventEmitter();
   @Output() translationSelected: EventEmitter<any> = new EventEmitter();
   @Output() translate: EventEmitter<{ sourceLanguage: string, targetLanguage: string }> = new EventEmitter();
+  @Output() export: EventEmitter<{ extensionExport: string, script: boolean }> = new EventEmitter();
   @Input() subtitleList: { name: string, lang_code: string, lang_translated: string }[];
 
   youtubeLink = '';
@@ -44,7 +45,7 @@ export class ToolbarComponent implements OnInit {
       const type: string = file.type;
       if (type === 'video/mp4' || type === 'video/webm' || type === 'video/ogg' || type.startsWith('audio/')) {
         this.videoId = '';
-        this.videoSelected.next(file);
+        this.videoSelected.emit(file);
       }
     }
   }
@@ -57,7 +58,7 @@ export class ToolbarComponent implements OnInit {
       } else {
         this.videoId = this.youtubeLink.substring(17);
       }
-      this.yTLinkPlayed.next(this.videoId);
+      this.yTLinkPlayed.emit(this.videoId);
     } else {
       this.toolsService.openSnackBar('This is not a YouTube link.', 2000);
     }
@@ -81,7 +82,7 @@ export class ToolbarComponent implements OnInit {
       const fileReader = new FileReader();
       fileReader.onload = () => {
         const data = fileReader.result;
-        this.subtitleSelected.next(this.subtitleParserService.parse(data, filename));
+        this.subtitleSelected.emit(this.subtitleParserService.parse(data, filename));
       };
       fileReader.readAsText(file);
     }
@@ -98,7 +99,7 @@ export class ToolbarComponent implements OnInit {
     params = params.append('fmt', 'vtt');
     this.http.get(url, { responseType: 'text', params }).subscribe(
       result => {
-        this.subtitleSelected.next(this.subtitleParserService.fromVtt(result));
+        this.subtitleSelected.emit(this.subtitleParserService.fromVtt(result));
       },
       error => {
         console.error(error);
@@ -112,7 +113,7 @@ export class ToolbarComponent implements OnInit {
       const fileReader = new FileReader();
       fileReader.onload = () => {
         const data = fileReader.result;
-        this.translationSelected.next(this.subtitleParserService.parse(data, filename));
+        this.translationSelected.emit(this.subtitleParserService.parse(data, filename));
       };
       fileReader.readAsText(file);
     }
@@ -129,7 +130,7 @@ export class ToolbarComponent implements OnInit {
     params = params.append('fmt', 'vtt');
     this.http.get(url, { responseType: 'text', params }).subscribe(
       result => {
-        this.translationSelected.next(this.subtitleParserService.fromVtt(result));
+        this.translationSelected.emit(this.subtitleParserService.fromVtt(result));
       },
       error => {
         console.error(error);
@@ -163,5 +164,13 @@ export class ToolbarComponent implements OnInit {
     const tmp = this.sourceLanguage;
     this.sourceLanguage = this.targetLanguage;
     this.targetLanguage = tmp;
+  }
+
+  onExportSubtitle(extensionExport: string): void {
+    this.export.emit({ extensionExport, script: true });
+  }
+
+  onExportTranslation(extensionExport: string): void {
+    this.export.emit({ extensionExport, script: false });
   }
 }
