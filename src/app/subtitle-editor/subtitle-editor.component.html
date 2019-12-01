@@ -4,21 +4,33 @@
 </app-toolbar>
 <mat-sidenav-container class=" sidenav-container">
   <mat-sidenav mode="side" opened class="sidenav">
-    <app-sidenav-embed-video [url]="url" [videoType]="videoType" (playerInitialized)="playerInitialized($event)"
-      (seekTo)="seekTo($event)" (played)="onPlayButton($event)" (audioVolumeChanged)="audioVolumeChanged($event)">
+    <app-sidenav-embed-video [url]="url" [videoType]="videoType" [script]="script"
+      [scriptTranslation]="scriptTranslation" [indexActive]="indexActive"
+      (playerInitialized)="playerInitialized($event)" (seekTo)="seekTo($event)" (played)="onPlayButton($event)"
+      (audioVolumeChanged)="audioVolumeChanged($event)">
     </app-sidenav-embed-video>
   </mat-sidenav>
   <mat-sidenav-content>
     <app-audiovizualizer [url]="url" (wavesurferInitialized)="wavesurferInitialized($event)" (seekTo)="seekTo($event)">
     </app-audiovizualizer>
-    <app-script-edit *ngIf="indexActive!==null" [indexActive]="indexActive" [time]="timeStamp[indexActive]"
+    <!-- <app-script-edit *ngIf="indexActive!==null" [indexActive]="indexActive" [time]="timeStamp[indexActive]"
       [startMs]="timeStamp[indexActive].startMs" [endMs]="timeStamp[indexActive].endMs" [sentence]="script[indexActive]"
-      [translation]="scriptTranslation[indexActive]"></app-script-edit>
-    <cdk-virtual-scroll-viewport [itemSize]="82" class="scroll-viewport" style="height: calc(100% - 320px);">
+      [translation]="scriptTranslation[indexActive]"></app-script-edit> -->
+    <cdk-virtual-scroll-viewport [itemSize]="82" class="scroll-viewport" style="height: calc(100% - 120px);">
       <app-script-line *cdkVirtualFor="let time of timeStamp; let i = index;" [index]="i" [indexActive]="indexActive"
-        [startMs]="time.startMs" [endMs]="time.endMs" [sentence]="script[i].text"
-        [translation]="scriptTranslation[i].text">
+        [startMs]="timeStamp[i].startMs" [endMs]="timeStamp[i].endMs" [time]="timeStamp[i]" [sentence]="script[i]"
+        [translation]="scriptTranslation[i]" [script]="script" [scriptTranslation]="scriptTranslation"
+        (lineClick)="lineClick($event)" (contextmenu)="onContextMenu($event, i)">
       </app-script-line>
     </cdk-virtual-scroll-viewport>
+    <div style="visibility: hidden; position: fixed" [style.left]="contextMenuPosition.x"
+      [style.top]="contextMenuPosition.y" [matMenuTriggerFor]="contextMenu">
+    </div>
+    <mat-menu #contextMenu="matMenu">
+      <ng-template matMenuContent let-index="index">
+        <button mat-menu-item (click)="deleteRow(index)">Delete Row</button>
+        <button mat-menu-item>Action 2</button>
+      </ng-template>
+    </mat-menu>
   </mat-sidenav-content>
 </mat-sidenav-container>

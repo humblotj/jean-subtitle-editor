@@ -1,4 +1,8 @@
 import { Component, OnInit, ViewChild, ElementRef, Input, OnChanges, SimpleChanges, Renderer2, Output, EventEmitter } from '@angular/core';
+import { Observable } from 'rxjs';
+import { MglishService } from '../services/mglish.service';
+import { SubtitleParserService } from '../services/subtitle-parser.service';
+import { take } from 'rxjs/operators';
 declare let videojs: any;
 
 @Component({
@@ -9,6 +13,9 @@ declare let videojs: any;
 export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
   @Input() url: string;
   @Input() videoType: string;
+  @Input() script: string[];
+  @Input() scriptTranslation: string[];
+  @Input() indexActive: number;
   @Output() playerInitialized: EventEmitter<any> = new EventEmitter();
   @Output() seekTo: EventEmitter<number> = new EventEmitter();
   @Output() played: EventEmitter<boolean> = new EventEmitter();
@@ -24,7 +31,7 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
   audioVolume = 0.25;
   audioVolumeTmp = 0.25;
 
-  constructor(private renderer: Renderer2) { }
+  constructor(private renderer: Renderer2, private mglishService: MglishService, private subtitleParserService: SubtitleParserService) { }
 
   ngOnInit() {
   }
@@ -32,6 +39,9 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.url && this.url !== '') {
       this.initPlayer();
+    }
+    if (changes.indexActive && this.indexActive !== null) {
+      this.mglishHandle().subscribe((result) => console.log(result));
     }
   }
 
@@ -117,6 +127,33 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
 
   onVolumeChange(event) {
     this.audioVolumeChanged.emit(event.value);
+  }
+
+  mglishHandle() {
+    const subtitleBuild = this.subtitleParserService.build([{
+      id: this.indexActive,
+      start: 0,
+      end: 0,
+      text: this.script[this.indexActive],
+    }], 'srt');
+
+    const blob = new Blob([subtitleBuild], { type: '.srt' });
+    return new Observable((subscriber) => {
+      this.mglishService.upload(blob, false, false).pipe(take(1)).subscribe(
+        (result: any) => {
+          const en = this.subtitleParserService.parse(result.en, 'mss');
+          const ko = this.subtitleParserService.parse(result.ko, 'mss');
+          const ko_dict = this.subtitleParserService.parse(result.ko_dict, 'mss');
+          const rpa = this.subtitleParserService.parse(result.roman, 'mss');
+          const chunked = this.subtitleParserService.parse(result.chunked, 'mss');
+          if (en.length === 1) {
+            const data = { en: en[0].text, ko: ko[0].text, rpa: ko[0].text };
+            subscriber.next(data);
+            subscriber.complete();
+          }
+          subscriber.error('length different');
+        });
+    });
   }
 
 }

@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { take } from 'rxjs/operators';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { MatMenuTrigger } from '@angular/material';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
 
@@ -30,10 +31,13 @@ export class SubtitleEditorComponent implements OnInit {
 
   @ViewChild(CdkVirtualScrollViewport, { static: false }) viewPort: CdkVirtualScrollViewport;
   timeStamp: { startMs: number, endMs: number }[] = [];
-  script: { text: string }[] = [];
-  scriptTranslation: { text: string }[] = [];
+  script: string[] = [];
+  scriptTranslation: string[] = [];
   indexActive: number = null;
   previousIndexActive: number = null;
+
+  @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
+  contextMenuPosition = { x: '0px', y: '0px' };
 
   constructor(private http: HttpClient,
     private dataStorageService: DataStorageService,
@@ -101,13 +105,13 @@ export class SubtitleEditorComponent implements OnInit {
     this.previousIndexActive = null;
     this.indexActive = null;
     this.timeStamp = data.map((line: any) => ({ startMs: line.startTime, endMs: line.endTime }));
-    const script = this.getFullText(data).split('\r\n').map((text: string) => ({ text }));
+    const script: string[] = this.getFullText(data).split('\r\n');
     for (let i = script.length; i < this.timeStamp.length; i++) {
-      script[i] = { text: '' };
+      script[i] = '';
     }
-    const scriptTranslation = [];
+    const scriptTranslation: string[] = [];
     for (let i = 0; i < this.timeStamp.length; i++) {
-      scriptTranslation[i] = { text: '' };
+      scriptTranslation[i] = '';
     }
     this.indexActive = 0;
     this.script = script;
@@ -119,17 +123,17 @@ export class SubtitleEditorComponent implements OnInit {
 
   translationSelected(data: any) {
     const timeStamp = data.map((line: any) => ({ startMs: line.startTime, endMs: line.endTime }));
-    const scriptTranslation = this.getFullText(data).split('\r\n').map((text: string) => ({ text }));
+    const scriptTranslation: string[] = this.getFullText(data).split('\r\n');
     if (timeStamp.length < this.timeStamp.length) {
       for (let i = timeStamp.length; i < this.timeStamp.length; i++) {
-        scriptTranslation[i] = { text: '' };
+        scriptTranslation[i] = '';
       }
     } else if (timeStamp.length > this.timeStamp.length) {
       const script = this.script.slice();
       const timeStampTmp = this.timeStamp.slice();
       for (let i = this.timeStamp.length; i < timeStamp.length; i++) {
         timeStampTmp[i] = timeStamp[i];
-        script[i] = { text: '' };
+        script[i] = '';
       }
       this.timeStamp = timeStampTmp;
       this.script = script;
@@ -146,17 +150,17 @@ export class SubtitleEditorComponent implements OnInit {
     if (this.script.length === 0) {
       this.toolsService.openSnackBar('Select Subtitle First', 2000);
     } else {
-      let scriptTranslation = [];
+      let scriptTranslation: string[] = [];
       for (let i = 0; i < this.timeStamp.length; i++) {
-        scriptTranslation[i] = { text: '' };
+        scriptTranslation[i] = '';
       }
       this.scriptTranslation = scriptTranslation;
-      const fullText = this.script.map(line => line.text).join('\r\n')
+      const fullText = this.script.join('\r\n')
         .replace(/(?<!\r)\n/g, ' ').replace(/\{(.*?)\}|\|/gi, '');
       this.translateService.translate(fullText, lang.sourceLanguage, lang.targetLanguage).subscribe(result => {
-        scriptTranslation = result.split('\r\n').map((text: string) => ({ text }));
+        scriptTranslation = result.split('\r\n');
         for (let i = scriptTranslation.length; i < this.timeStamp.length; i++) {
-          scriptTranslation[i] = { text: '' };
+          scriptTranslation[i] = '';
         }
         this.scriptTranslation = scriptTranslation;
       },
@@ -182,7 +186,7 @@ export class SubtitleEditorComponent implements OnInit {
             id: index,
             start: line.startMs,
             end: line.endMs,
-            text: text[index].text.trim()
+            text: text[index].trim()
           };
         });
         const dataFile = this.subtitleParserService.build(dataJSON, event.extensionExport);
@@ -195,7 +199,7 @@ export class SubtitleEditorComponent implements OnInit {
             id: index,
             start: line.startMs,
             end: line.endMs,
-            text: text[index].text.replace(/\{(.*?)\}/gi, '').trim()
+            text: text[index].replace(/\{(.*?)\}/gi, '').trim()
           };
         });
         const dataFile = this.subtitleParserService.build(dataJSON, event.extensionExport);
@@ -242,32 +246,12 @@ export class SubtitleEditorComponent implements OnInit {
       if (event.id !== this.indexActive) {
         this.setIndexActive(event.id);
         this.pause();
-
-        if (this.previousIndexActive !== null && this.previousIndexActive !== event.id &&
-          typeof this.wavesurfer.regions.list[this.previousIndexActive] !== 'undefined') {
-          this.wavesurfer.regions.list[this.previousIndexActive].unAll();
-          this.wavesurfer.regions.list[this.previousIndexActive].remove();
-
-          this.addRegion(this.previousIndexActive, false,
-            this.previousIndexActive % 2 === 0 ? 'rgba(0,0,128,.1)' : 'hsla(100, 100%, 30%, 0.1)');
-        }
-        if (typeof this.wavesurfer.regions.list[event.id] !== 'undefined') {
-          this.wavesurfer.regions.list[event.id].remove();
-          this.addRegionActive(event.id);
-        }
       }
     });
 
     this.wavesurfer.on('region-in', (event) => {
       if (event.id !== this.indexActive && this.repeatTimeout === null) {
         if (this.timeStamp[event.id].startMs - this.timeStamp[this.indexActive].startMs > 300) {
-          this.wavesurfer.regions.list[this.indexActive].remove();
-          this.addRegion(this.indexActive, false,
-            this.indexActive % 2 === 0 ? 'rgba(0,0,128,.1)' : 'hsla(100, 100%, 30%, 0.1)');
-          if (typeof this.wavesurfer.regions.list[event.id] !== 'undefined') {
-            this.wavesurfer.regions.list[event.id].remove();
-          }
-          this.addRegionActive(event.id);
           this.setIndexActive(event.id);
         }
       }
@@ -276,13 +260,33 @@ export class SubtitleEditorComponent implements OnInit {
 
   setIndexActive(index: number) {
     this.previousIndexActive = this.indexActive;
+    if (this.wavesurfer) {
+      if (this.previousIndexActive !== null && this.previousIndexActive !== index &&
+        typeof this.wavesurfer.regions.list[this.previousIndexActive] !== 'undefined') {
+        this.wavesurfer.regions.list[this.previousIndexActive].unAll();
+        this.wavesurfer.regions.list[this.previousIndexActive].remove();
+
+        this.addRegion(this.previousIndexActive, false,
+          this.previousIndexActive % 2 === 0 ? 'rgba(0,0,128,.1)' : 'hsla(100, 100%, 30%, 0.1)');
+      }
+      if (typeof this.wavesurfer.regions.list[index] !== 'undefined') {
+        this.wavesurfer.regions.list[index].remove();
+        this.addRegionActive(index);
+      }
+    }
     this.indexActive = index;
   }
 
   seekTo(progress: number) {
-    const time = this.player.duration() * progress / 100;
-    this.player.currentTime(time);
-    this.wavesurfer.seekAndCenter(progress / 100);
+    if (progress > 0 && progress < 100) {
+      if (this.player) {
+        const time = this.player.duration() * progress / 100;
+        this.player.currentTime(time);
+      }
+      if (this.wavesurfer) {
+        this.wavesurfer.seekAndCenter(progress / 100);
+      }
+    }
   }
 
   pause() {
@@ -293,6 +297,15 @@ export class SubtitleEditorComponent implements OnInit {
     }
     if (this.wavesurfer) {
       this.wavesurfer.pause();
+    }
+  }
+
+  lineClick(index: number) {
+    this.setIndexActive(index);
+    this.pause();
+    const duration = this.wavesurfer ? this.wavesurfer.getDuration() : this.player ? this.player.getDuration() : null;
+    if (duration) {
+      this.seekTo((this.timeStamp[index].startMs / 10) / duration);
     }
   }
 
@@ -369,7 +382,7 @@ export class SubtitleEditorComponent implements OnInit {
             color,
             attributes: {
               id: (id + 1),
-              top: this.script[id].text.replace(/\{(.*?)\}|\|/gi, ''),
+              top: this.script[id].replace(/\{(.*?)\}|\|/gi, ''),
             }
           });
           break;
@@ -383,7 +396,7 @@ export class SubtitleEditorComponent implements OnInit {
             color,
             attributes: {
               id: (id + 1),
-              top: this.scriptTranslation[id].text.replace(/\{(.*?)\}|\|/gi, '')
+              top: this.scriptTranslation[id].replace(/\{(.*?)\}|\|/gi, '')
             }
           });
           break;
@@ -397,8 +410,8 @@ export class SubtitleEditorComponent implements OnInit {
             color,
             attributes: {
               id: (id + 1),
-              top: this.script[id].text.replace(/\{(.*?)\}|\|/gi, ''),
-              bottom: this.scriptTranslation[id].text.replace(/\{(.*?)\}|\|/gi, '')
+              top: this.script[id].replace(/\{(.*?)\}|\|/gi, ''),
+              bottom: this.scriptTranslation[id].replace(/\{(.*?)\}|\|/gi, '')
             }
           });
           break;
@@ -461,6 +474,24 @@ export class SubtitleEditorComponent implements OnInit {
         });
       }
     }
+  }
+
+  onContextMenu(event: MouseEvent, index: number) {
+    event.preventDefault();
+    this.contextMenuPosition.x = event.clientX + 'px';
+    this.contextMenuPosition.y = event.clientY + 'px';
+    this.contextMenu.menuData = { index };
+    this.contextMenu.menu.focusFirstItem('mouse');
+    this.contextMenu.openMenu();
+  }
+
+  deleteRow(index: number) {
+    if (this.indexActive === this.timeStamp.length - 1) {
+      this.setIndexActive(this.indexActive === 0 ? 0 : this.indexActive - 1);
+    }
+    this.timeStamp.splice(index, 1);
+    this.script.splice(index, 1);
+    this.scriptTranslation.splice(index, 1);
   }
 
 

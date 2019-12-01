@@ -74,6 +74,29 @@
           </mat-form-field>
         </div>
         <mat-divider [vertical]="true"></mat-divider>
+        <button mat-button [matMenuTriggerFor]="menuExportSubtitle">
+          <div fxLayout="column" fxLayoutAlign="center center">
+            <mat-icon svgIcon="subtitles-outline" style="margin-top: 8px;"></mat-icon>
+            <span style="font-size: smaller;margin-top: -10px;">Export Subtitle</span>
+          </div>
+        </button>
+        <mat-menu #menuExportSubtitle="matMenu">
+          <button mat-menu-item *ngFor="let extension of extensions" (click)="onExportSubtitle(extension)">
+            as .{{extension}}
+          </button>
+        </mat-menu>
+        <button mat-button [matMenuTriggerFor]="menuExport">
+          <div fxLayout="column" fxLayoutAlign="center center">
+            <mat-icon svgIcon="subtitles" style="margin-top: 8px;"></mat-icon>
+            <span style="font-size: smaller;margin-top: -10px;">Export Translation</span>
+          </div>
+        </button>
+        <mat-menu #menuExport="matMenu">
+          <button mat-menu-item *ngFor="let extension of extensions" (click)="onExportTranslation(extension)">
+            as .{{extension}}
+          </button>
+        </mat-menu>
+        <mat-divider [vertical]="true"></mat-divider>
       </div>
     </mat-tab>
     <mat-tab label="Video">

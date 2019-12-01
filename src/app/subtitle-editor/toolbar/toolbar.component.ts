@@ -34,6 +34,15 @@ export class ToolbarComponent implements OnInit {
   private oldSourceLanguage = '';
   private oldTargetLanguage = '';
 
+  extensions = [
+    'srt',
+    'sbv',
+    'ass',
+    'mss',
+    'txt',
+    'xlsx'
+  ];
+
   constructor(private toolsService: ToolsService, private subtitleParserService: SubtitleParserService, private http: HttpClient) { }
 
   ngOnInit() {

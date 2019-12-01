@@ -1,12 +1,35 @@
-<div fxLayout="row" class="script-container" fxLayoutAlign="center center">
+<div fxLayout="row" [ngClass]="{'script-container': true, 'active': indexActive === index}"
+  fxLayoutAlign="center center" (click)="onLineClick()">
   <span style="font-size: small; margin-left: 12px">{{index+1}}</span>
-  <div fxLayout="column" fxLayoutAlign="center center" style="margin-left: 12px">
-    <span style="color: gray; font-size: small;">{{startTime}}</span>
-    <span style="color: gray; font-size: small;">{{endTime}}</span>
+  <div fxLayout="column" fxLayoutAlign="center center" style="margin-left: 12px; margin-top: 10px;">
+    <!-- <span style="color: gray; font-size: small;">{{startTime}}</span>
+    <span style="color: gray; font-size: small;">{{endTime}}</span> -->
+    <mat-form-field style="width: 56px; margin:-17px 0" appearance="none">
+      <input type="text" matInput #startInput [ngModel]="startTime" pattern="^[0-5][0-9]:[0-5][0-9].[0-9]{2}"
+        (focus)="oldStart=$event.target.value" (focusout)="updateStart($event)" style="color: gray; font-size: small;">
+    </mat-form-field>
+    <mat-form-field style="width: 56px; margin:-17px 0" appearance="none">
+      <input type="text" matInput #endInput [ngModel]="endTime" pattern="^[0-5][0-9]:[0-5][0-9].[0-9]{2}"
+        (focus)="oldEnd=$event.target.value" (focusout)="updateEnd($event)" style="color: gray; font-size: small;">
+    </mat-form-field>
   </div>
   <div fxLayout="column" style="width: 100%;">
-    <span class="text-preview">{{sentence}}</span>
+    <mat-form-field style="width: 100%; margin-bottom: -25px; margin-top: -14px" appearance="none">
+      <textarea #sentenceEdit matInput [(ngModel)]="script[index]" class="text-preview" rows="1"></textarea>
+    </mat-form-field>
     <hr class="underline">
-    <span class="text-preview" style="color: gray;">{{translation}}</span>
+    <mat-form-field style="width: 100%; margin-bottom: -25px; margin-top: -14px" appearance="none">
+      <textarea #translationEdit matInput [(ngModel)]="scriptTranslation[index]" class="text-preview"
+        rows="1"></textarea>
+    </mat-form-field>
+    <!-- <hr class="underline">
+    <div fxLayout="row">
+      <span *ngIf="chunkTexts.length!==0">{{chunkTexts[0]}}</span>
+      <ng-container *ngFor="let chunk of chunks; let i = index">
+        <span style="width: 10px; text-align: center; color: red; cursor: pointer;"
+          (click)="toggleChunk(i)">{{chunk ? '|' : ''}}</span>
+        <span>{{chunkTexts[i+1]}}</span>
+      </ng-container>
+    </div> -->
   </div>
 </div>
