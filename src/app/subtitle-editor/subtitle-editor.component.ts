@@ -494,5 +494,52 @@ export class SubtitleEditorComponent implements OnInit {
     this.scriptTranslation.splice(index, 1);
   }
 
+  insertNext(index: number) {
+    const start = this.timeStamp[index].endMs;
+    let end = index === this.timeStamp.length - 1 ?
+      this.timeStamp[index].endMs : this.timeStamp[index + 1].startMs;
+
+    end = Math.max(+start, +end);
+
+    this.timeStamp.splice(index + 1, 0, { startMs: start, endMs: end });
+    this.script.splice(index + 1, 0, '');
+    this.scriptTranslation.splice(index + 1, 0, '');
+  }
+
+
+  duplicate(index: number) {
+    let start = this.timeStamp[index].startMs + (this.timeStamp[index].endMs - this.timeStamp[index].startMs) / 2;
+    start = +start.toFixed(2);
+    const end = this.timeStamp[index].endMs;
+
+    this.timeStamp.splice(index + 1, 0, { startMs: start, endMs: end });
+    this.script.splice(index + 1, 0, this.script[index]);
+    this.scriptTranslation.splice(index + 1, 0, this.scriptTranslation[index]);
+  }
+
+  merge(index: number) {
+    if (this.indexActive === this.timeStamp.length - 1) {
+      this.setIndexActive(this.indexActive === 0 ? 0 : this.indexActive - 1);
+    }
+    this.scriptTranslation[index] =
+      (this.scriptTranslation[index].trim() + ' ' + this.scriptTranslation[index + 1]).trim();
+    this.scriptTranslation.splice(index + 1, 1);
+
+    this.script[index] =
+      (this.script[index].trim() + ' ' + this.script[index + 1]).trim();
+    this.script.splice(index + 1, 1);
+    this.timeStamp[index] = { startMs: this.timeStamp[index].startMs, endMs: this.timeStamp[index + 1].endMs };
+    this.timeStamp.splice(index + 1, 1);
+  }
+
+  deleteLeft(index: number) {
+    this.script.splice(index, 1);
+    this.script[this.script.length] = '';
+  }
+
+  deleteRight(index: number) {
+    this.scriptTranslation.splice(index, 1);
+    this.scriptTranslation[this.script.length] = '';
+  }
 
 }

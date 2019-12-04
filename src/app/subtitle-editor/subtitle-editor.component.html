@@ -29,7 +29,11 @@
     <mat-menu #contextMenu="matMenu">
       <ng-template matMenuContent let-index="index">
         <button mat-menu-item (click)="deleteRow(index)">Delete Row</button>
-        <button mat-menu-item>Action 2</button>
+        <button mat-menu-item (click)="insertNext(index)">Insert next</button>
+        <button mat-menu-item (click)="duplicate(index)">Duplicate</button>
+        <button mat-menu-item (click)="merge(index)">Merge with next line</button>
+        <button mat-menu-item (click)="deleteLeft(index)">Delete Only Left Row</button>
+        <button mat-menu-item (click)="deleteRight(index)">Delete Only Right Row</button>
       </ng-template>
     </mat-menu>
   </mat-sidenav-content>
