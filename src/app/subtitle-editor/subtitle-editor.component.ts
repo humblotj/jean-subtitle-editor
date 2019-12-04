@@ -492,6 +492,7 @@ export class SubtitleEditorComponent implements OnInit {
     this.timeStamp.splice(index, 1);
     this.script.splice(index, 1);
     this.scriptTranslation.splice(index, 1);
+    this.timeStamp = this.timeStamp.slice();
   }
 
   insertNext(index: number) {
@@ -521,15 +522,15 @@ export class SubtitleEditorComponent implements OnInit {
     if (this.indexActive === this.timeStamp.length - 1) {
       this.setIndexActive(this.indexActive === 0 ? 0 : this.indexActive - 1);
     }
-    this.scriptTranslation[index] =
-      (this.scriptTranslation[index].trim() + ' ' + this.scriptTranslation[index + 1]).trim();
-    this.scriptTranslation.splice(index + 1, 1);
-
+    this.timeStamp[index] = { startMs: this.timeStamp[index].startMs, endMs: this.timeStamp[index + 1].endMs };
+    this.timeStamp.splice(index + 1, 1);
     this.script[index] =
       (this.script[index].trim() + ' ' + this.script[index + 1]).trim();
     this.script.splice(index + 1, 1);
-    this.timeStamp[index] = { startMs: this.timeStamp[index].startMs, endMs: this.timeStamp[index + 1].endMs };
-    this.timeStamp.splice(index + 1, 1);
+    this.scriptTranslation[index] =
+      (this.scriptTranslation[index].trim() + ' ' + this.scriptTranslation[index + 1]).trim();
+    this.scriptTranslation.splice(index + 1, 1);
+    this.timeStamp = this.timeStamp.slice();
   }
 
   deleteLeft(index: number) {
