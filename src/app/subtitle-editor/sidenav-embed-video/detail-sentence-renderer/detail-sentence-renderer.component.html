@@ -1,0 +1,8 @@
+<div fxLayout="row wrap" style="padding: 0 12px;">
+  <div *ngFor="let item of tops; let i=index" fxLayout="column" fxLayoutAlign="center center">
+    <app-mss-renderer [text]="tops[i]" [defaultSize]="18">
+    </app-mss-renderer>
+    <app-mss-renderer [text]="bottoms[i]" [defaultSize]="12" [defaultColor]="secondaryText" [onlyBold]="true">
+    </app-mss-renderer>
+  </div>
+</div>

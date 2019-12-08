@@ -31,6 +31,9 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
   audioVolume = 0.25;
   audioVolumeTmp = 0.25;
 
+  topText = '';
+  bottomText = '';
+
   constructor(private renderer: Renderer2, private mglishService: MglishService, private subtitleParserService: SubtitleParserService) { }
 
   ngOnInit() {
@@ -41,7 +44,7 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
       this.initPlayer();
     }
     if (changes.indexActive && this.indexActive !== null) {
-      this.mglishHandle().subscribe((result) => console.log(result));
+      this.mglishHandle().subscribe((result: any) => { this.topText = result.en; this.bottomText = result.ko; });
     }
   }
 

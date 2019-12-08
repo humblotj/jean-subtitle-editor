@@ -278,7 +278,7 @@ export class SubtitleEditorComponent implements OnInit {
   }
 
   seekTo(progress: number) {
-    if (progress > 0 && progress < 100) {
+    if (progress >= 0 && progress <= 100) {
       if (this.player) {
         const time = this.player.duration() * progress / 100;
         this.player.currentTime(time);

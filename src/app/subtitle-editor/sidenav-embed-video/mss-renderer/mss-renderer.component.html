@@ -1,0 +1,11 @@
+<span [style.padding]="'0 4px'">
+  <ng-container *ngFor="let item of views">
+    <span *ngIf="onlyBold" [style.font-size]="mStyles.default.size+'px'"
+      [style.color]="item.style.bold ? 'rgb(18,186,129)' : mStyles.default.color"
+      [style.font-weight]="item.style.bold ? 'bold' : 'normal'"
+      [style.font-style]="item.style.italic ? 'italic' : 'normal'">{{item.text}}</span>
+    <span *ngIf="!onlyBold" [style.font-size]="item.style.size+'px'" [style.color]="item.style.color"
+      [style.font-weight]="item.style.bold ? 'bold' : 'normal'"
+      [style.font-style]="item.style.italic ? 'italic' : 'normal'">{{item.text}}</span>
+  </ng-container>
+</span>

@@ -13,6 +13,7 @@ import { MatIconRegistry } from '@angular/material';
 import { SubtitleEditorModule } from './subtitle-editor/subtitle-editor.module';
 import { WildcardRoutingModule } from './wildcard-routing.module';
 import { environment } from '../environments/environment';
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { environment } from '../environments/environment';
   ],
   imports: [
     BrowserModule,
+    SharedModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     SubtitleEditorModule,

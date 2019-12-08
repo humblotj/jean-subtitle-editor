@@ -10,6 +10,8 @@ import { AudiovizualizerComponent } from './audiovizualizer/audiovizualizer.comp
 import { ScriptLineComponent } from './script-line/script-line.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ScriptEditComponent } from './script-edit/script-edit.component';
+import { DetailSentenceRendererComponent } from './sidenav-embed-video/detail-sentence-renderer/detail-sentence-renderer.component';
+import { MssRendererComponent } from './sidenav-embed-video/mss-renderer/mss-renderer.component';
 
 @NgModule({
   declarations: [SubtitleEditorComponent,
@@ -17,7 +19,9 @@ import { ScriptEditComponent } from './script-edit/script-edit.component';
     ToolbarComponent,
     AudiovizualizerComponent,
     ScriptLineComponent,
-    ScriptEditComponent
+    ScriptEditComponent,
+    DetailSentenceRendererComponent,
+    MssRendererComponent
   ],
   imports: [
     SharedModule,

@@ -27,30 +27,6 @@ import {
 import {DragDropModule} from '@angular/cdk/drag-drop';
 
 @NgModule({
-  imports: [
-    MatButtonModule,
-    MatProgressSpinnerModule,
-    MatCardModule,
-    MatInputModule,
-    MatDividerModule,
-    MatToolbarModule,
-    MatTabsModule,
-    MatExpansionModule,
-    MatSidenavModule,
-    MatSelectModule,
-    MatCheckboxModule,
-    MatTooltipModule,
-    MatSnackBarModule,
-    MatBottomSheetModule,
-    MatAutocompleteModule,
-    MatMenuModule,
-    MatSliderModule,
-    MatDialogModule,
-    MatIconModule,
-    MatListModule,
-    MatSlideToggleModule,
-    MatRadioModule
-  ],
   exports: [
     MatButtonModule,
     MatProgressSpinnerModule,
