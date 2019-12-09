@@ -44,7 +44,14 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
       this.initPlayer();
     }
     if (changes.indexActive && this.indexActive !== null) {
-      this.mglishHandle().subscribe((result: any) => { this.topText = result.en; this.bottomText = result.ko; });
+      const subtitleBuild = this.subtitleParserService.build([{
+        id: this.indexActive,
+        start: 0,
+        end: 0,
+        text: this.script[this.indexActive],
+      }], 'srt');
+      this.mglishService.getMglishSubtitles(subtitleBuild).subscribe(
+        (result: any) => { this.topText = result[0].en; this.bottomText = result[0].ko; });
     }
   }
 
@@ -130,33 +137,6 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
 
   onVolumeChange(event) {
     this.audioVolumeChanged.emit(event.value);
-  }
-
-  mglishHandle() {
-    const subtitleBuild = this.subtitleParserService.build([{
-      id: this.indexActive,
-      start: 0,
-      end: 0,
-      text: this.script[this.indexActive],
-    }], 'srt');
-
-    const blob = new Blob([subtitleBuild], { type: '.srt' });
-    return new Observable((subscriber) => {
-      this.mglishService.upload(blob, false, false).pipe(take(1)).subscribe(
-        (result: any) => {
-          const en = this.subtitleParserService.parse(result.en, 'mss');
-          const ko = this.subtitleParserService.parse(result.ko, 'mss');
-          const ko_dict = this.subtitleParserService.parse(result.ko_dict, 'mss');
-          const rpa = this.subtitleParserService.parse(result.roman, 'mss');
-          const chunked = this.subtitleParserService.parse(result.chunked, 'mss');
-          if (en.length === 1) {
-            const data = { en: en[0].text, ko: ko[0].text, rpa: ko[0].text };
-            subscriber.next(data);
-            subscriber.complete();
-          }
-          subscriber.error('length different');
-        });
-    });
   }
 
 }

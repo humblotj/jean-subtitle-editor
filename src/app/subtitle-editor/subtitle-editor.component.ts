@@ -10,6 +10,7 @@ import { DataStorageService } from './services/data-storage.service';
 import { ToolsService } from './services/tools.service';
 import { TranslateService } from './services/translate.service';
 import { SubtitleParserService } from './services/subtitle-parser.service';
+import { MglishService } from './services/mglish.service';
 
 @Component({
   selector: 'app-subtitle-editor',
@@ -33,6 +34,7 @@ export class SubtitleEditorComponent implements OnInit {
   timeStamp: { startMs: number, endMs: number }[] = [];
   script: string[] = [];
   scriptTranslation: string[] = [];
+  preview: { bottomText: string, topText: string }[];
   indexActive: number = null;
   previousIndexActive: number = null;
 
@@ -43,7 +45,8 @@ export class SubtitleEditorComponent implements OnInit {
     private dataStorageService: DataStorageService,
     private toolsService: ToolsService,
     private translateService: TranslateService,
-    private subtitleParserService: SubtitleParserService) { }
+    private subtitleParserService: SubtitleParserService,
+    private mglishService: MglishService) { }
 
   ngOnInit() {
   }
@@ -113,6 +116,8 @@ export class SubtitleEditorComponent implements OnInit {
     for (let i = 0; i < this.timeStamp.length; i++) {
       scriptTranslation[i] = '';
     }
+    this.mglishService.getMglishSubtitles(data).subscribe(
+      (result: any) => { console.log(result); });
     this.indexActive = 0;
     this.script = script;
     this.scriptTranslation = scriptTranslation;
