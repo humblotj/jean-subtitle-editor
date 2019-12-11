@@ -82,6 +82,8 @@ export class ScriptLineComponent implements OnInit, OnChanges {
   }
 
   onLineClick() {
-    this.lineClick.next(this.index);
+    if (this.indexActive !== this.index) {
+      this.lineClick.next(this.index);
+    }
   }
 }

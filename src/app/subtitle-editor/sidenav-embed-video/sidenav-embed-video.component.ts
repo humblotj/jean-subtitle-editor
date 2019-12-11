@@ -15,6 +15,7 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
   @Input() videoType: string;
   @Input() script: string[];
   @Input() scriptTranslation: string[];
+  @Input() preview: { en: string, ko: string, rpa: string }[];
   @Input() indexActive: number;
   @Output() playerInitialized: EventEmitter<any> = new EventEmitter();
   @Output() seekTo: EventEmitter<number> = new EventEmitter();
@@ -44,14 +45,32 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
       this.initPlayer();
     }
     if (changes.indexActive && this.indexActive !== null) {
-      const subtitleBuild = this.subtitleParserService.build([{
-        id: this.indexActive,
-        start: 0,
-        end: 0,
-        text: this.script[this.indexActive],
-      }], 'srt');
-      this.mglishService.getMglishSubtitles(subtitleBuild).subscribe(
-        (result: any) => { this.topText = result[0].en; this.bottomText = result[0].ko; });
+      if (this.preview != null) {
+        this.topText = this.preview[this.indexActive].en;
+        this.bottomText = this.preview[this.indexActive].ko;
+      }
+      if (changes.indexActive.previousValue !== null) {
+        const previousIndex = changes.indexActive.previousValue;
+        if (this.preview[previousIndex].en.replace(/\{(.*?)\}/gi, '') !== this.script[previousIndex]) {
+          const subtitleBuild = this.subtitleParserService.build([{
+            id: previousIndex,
+            start: 0,
+            end: 0,
+            text: this.script[previousIndex],
+          }], 'srt');
+          this.mglishService.getMglishSubtitles(subtitleBuild).subscribe(
+            (result: any) => {
+              this.preview[previousIndex].en = result[0].en;
+              this.preview[previousIndex].ko = result[0].ko;
+            });
+        }
+      }
+    }
+    if (changes.preview) {
+      if (this.preview != null) {
+        this.topText = this.preview[this.indexActive].en;
+        this.bottomText = this.preview[this.indexActive].ko;
+      }
     }
   }
 

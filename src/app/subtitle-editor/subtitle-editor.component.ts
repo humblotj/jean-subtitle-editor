@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { take } from 'rxjs/operators';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
@@ -34,12 +34,27 @@ export class SubtitleEditorComponent implements OnInit {
   timeStamp: { startMs: number, endMs: number }[] = [];
   script: string[] = [];
   scriptTranslation: string[] = [];
-  preview: { bottomText: string, topText: string }[];
+  preview: { en: string, ko: string, rpa: string }[];
   indexActive: number = null;
   previousIndexActive: number = null;
 
   @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
   contextMenuPosition = { x: '0px', y: '0px' };
+
+  // @HostListener('keydown', ['$event'])
+  // keyEvent(event: KeyboardEvent) {
+  //   if (event.key === 'ArrowUp') {
+  //     event.preventDefault();
+  //     if (this.indexActive !== 0) {
+  //       this.setIndexActive(this.indexActive - 1);
+  //     }
+  //   } else if (event.key === 'ArrowDown') {
+  //     event.preventDefault();
+  //     if (this.indexActive !== this.timeStamp.length - 1) {
+  //       this.setIndexActive(this.indexActive + 1);
+  //     }
+  //   }
+  // }
 
   constructor(private http: HttpClient,
     private dataStorageService: DataStorageService,
@@ -116,8 +131,17 @@ export class SubtitleEditorComponent implements OnInit {
     for (let i = 0; i < this.timeStamp.length; i++) {
       scriptTranslation[i] = '';
     }
-    this.mglishService.getMglishSubtitles(data).subscribe(
-      (result: any) => { console.log(result); });
+    const dataJSON = this.timeStamp.map((line, index: number) => {
+      return {
+        id: index,
+        start: line.startMs,
+        end: line.endMs,
+        text: script[index].replace(/\{(.*?)\}/gi, '').trim()
+      };
+    });
+    const dataFile = this.subtitleParserService.build(dataJSON, 'srt');
+    this.mglishService.getMglishSubtitles(dataFile).subscribe(
+      (result: any) => { this.preview = result; });
     this.indexActive = 0;
     this.script = script;
     this.scriptTranslation = scriptTranslation;

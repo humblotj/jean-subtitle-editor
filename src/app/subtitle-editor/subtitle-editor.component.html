@@ -5,7 +5,7 @@
 <mat-sidenav-container class=" sidenav-container">
   <mat-sidenav mode="side" opened class="sidenav">
     <app-sidenav-embed-video [url]="url" [videoType]="videoType" [script]="script"
-      [scriptTranslation]="scriptTranslation" [indexActive]="indexActive"
+      [scriptTranslation]="scriptTranslation" [preview]="preview" [indexActive]="indexActive"
       (playerInitialized)="playerInitialized($event)" (seekTo)="seekTo($event)" (played)="onPlayButton($event)"
       (audioVolumeChanged)="audioVolumeChanged($event)">
     </app-sidenav-embed-video>
