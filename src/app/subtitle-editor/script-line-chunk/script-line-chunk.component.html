@@ -1,0 +1,8 @@
+<div fxLayout="row">
+  <span *ngIf="chunkTexts.length!==0">{{chunkTexts[0]}}</span>
+  <ng-container *ngFor="let chunk of chunks; let i = index">
+    <span style="width: 20px; text-align: center; color: red; cursor: pointer;"
+      (click)="toggleChunk(i)">{{chunk ? '|' : ''}}</span>
+    <span>{{chunkTexts[i+1]}}</span>
+  </ng-container>
+</div>

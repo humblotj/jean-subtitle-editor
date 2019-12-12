@@ -1,6 +1,6 @@
 <app-toolbar [subtitleList]="subtitleList" (videoSelected)="videoSelected($event)" (yTLinkPlayed)="yTLinkPlayed($event)"
   (subtitleSelected)="subtitleSelected($event)" (translationSelected)="translationSelected($event)"
-  (translate)="translate($event)">
+  (translate)="translate($event)" chunkModeChanged="chunkModeChanged($event)">
 </app-toolbar>
 <mat-sidenav-container class=" sidenav-container">
   <mat-sidenav mode="side" opened class="sidenav">
@@ -16,12 +16,19 @@
     <!-- <app-script-edit *ngIf="indexActive!==null" [indexActive]="indexActive" [time]="timeStamp[indexActive]"
       [startMs]="timeStamp[indexActive].startMs" [endMs]="timeStamp[indexActive].endMs" [sentence]="script[indexActive]"
       [translation]="scriptTranslation[indexActive]"></app-script-edit> -->
-    <cdk-virtual-scroll-viewport [itemSize]="82" class="scroll-viewport" style="height: calc(100% - 120px);">
+    <cdk-virtual-scroll-viewport *ngIf="!chunkMode" [itemSize]="82" class="scroll-viewport"
+      style="height: calc(100% - 120px);">
       <app-script-line *cdkVirtualFor="let time of timeStamp; let i = index;" [index]="i" [indexActive]="indexActive"
         [startMs]="timeStamp[i].startMs" [endMs]="timeStamp[i].endMs" [time]="timeStamp[i]" [sentence]="script[i]"
         [translation]="scriptTranslation[i]" [script]="script" [scriptTranslation]="scriptTranslation"
         (lineClick)="lineClick($event)" (contextmenu)="onContextMenu($event, i)">
       </app-script-line>
+    </cdk-virtual-scroll-viewport>
+    <cdk-virtual-scroll-viewport *ngIf="chunkMode" [itemSize]="82" class="scroll-viewport"
+      style="height: calc(100% - 120px);">
+      <app-script-line-chunk *cdkVirtualFor="let time of timeStamp; let i = index;" [index]="i" [sentence]="script[i]"
+        [script]="script">
+      </app-script-line-chunk>
     </cdk-virtual-scroll-viewport>
     <div style="visibility: hidden; position: fixed" [style.left]="contextMenuPosition.x"
       [style.top]="contextMenuPosition.y" [matMenuTriggerFor]="contextMenu">

@@ -17,6 +17,7 @@ export class ToolbarComponent implements OnInit {
   @Output() translationSelected: EventEmitter<any> = new EventEmitter();
   @Output() translate: EventEmitter<{ sourceLanguage: string, targetLanguage: string }> = new EventEmitter();
   @Output() export: EventEmitter<{ extensionExport: string, script: boolean }> = new EventEmitter();
+  @Output() chunkModeChanged: EventEmitter<boolean> = new EventEmitter();
   @Input() subtitleList: { name: string, lang_code: string, lang_translated: string }[];
 
   youtubeLink = '';
@@ -42,6 +43,8 @@ export class ToolbarComponent implements OnInit {
     'txt',
     'xlsx'
   ];
+
+  private chunkMode = false;
 
   constructor(private toolsService: ToolsService, private subtitleParserService: SubtitleParserService, private http: HttpClient) { }
 
@@ -181,5 +184,10 @@ export class ToolbarComponent implements OnInit {
 
   onExportTranslation(extensionExport: string): void {
     this.export.emit({ extensionExport, script: false });
+  }
+
+  onChunkMode() {
+    this.chunkMode = !this.chunkMode;
+    this.chunkModeChanged.next(this.chunkMode);
   }
 }

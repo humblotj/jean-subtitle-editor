@@ -12,6 +12,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ScriptEditComponent } from './script-edit/script-edit.component';
 import { DetailSentenceRendererComponent } from './sidenav-embed-video/detail-sentence-renderer/detail-sentence-renderer.component';
 import { MssRendererComponent } from './sidenav-embed-video/mss-renderer/mss-renderer.component';
+import { ScriptLineChunkComponent } from './script-line-chunk/script-line-chunk.component';
 
 @NgModule({
   declarations: [SubtitleEditorComponent,
@@ -21,7 +22,8 @@ import { MssRendererComponent } from './sidenav-embed-video/mss-renderer/mss-ren
     ScriptLineComponent,
     ScriptEditComponent,
     DetailSentenceRendererComponent,
-    MssRendererComponent
+    MssRendererComponent,
+    ScriptLineChunkComponent
   ],
   imports: [
     SharedModule,

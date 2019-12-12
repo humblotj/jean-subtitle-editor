@@ -129,6 +129,13 @@
         <mat-divider [vertical]="true"></mat-divider>
       </div>
     </mat-tab>
-    <mat-tab label="Third"> Content 3 </mat-tab>
+    <mat-tab label="Edit">
+      <button mat-button (click)="onChunkMode()">
+        <div fxLayout="column" fxLayoutAlign="center center">
+          <mat-icon svgIcon="format-horizontal-align-center" style="margin-top: 8px;"></mat-icon>
+          <span style="font-size: smaller;margin-top: -10px;">Chunk Mode</span>
+        </div>
+      </button>
+    </mat-tab>
   </mat-tab-group>
 </mat-toolbar>

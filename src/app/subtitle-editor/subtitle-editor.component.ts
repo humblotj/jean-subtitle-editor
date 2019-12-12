@@ -30,6 +30,8 @@ export class SubtitleEditorComponent implements OnInit {
   private adjacentTimeUpdated = false;
   private labelSelected = 'original text';
 
+  chunkMode = true;
+
   @ViewChild(CdkVirtualScrollViewport, { static: false }) viewPort: CdkVirtualScrollViewport;
   timeStamp: { startMs: number, endMs: number }[] = [];
   script: string[] = [];
@@ -570,6 +572,10 @@ export class SubtitleEditorComponent implements OnInit {
   deleteRight(index: number) {
     this.scriptTranslation.splice(index, 1);
     this.scriptTranslation[this.script.length] = '';
+  }
+
+  chunkModeChanged(chunkMode: boolean) {
+    this.chunkMode = chunkMode;
   }
 
 }
