@@ -30,7 +30,7 @@ export class SubtitleEditorComponent implements OnInit {
   private adjacentTimeUpdated = false;
   private labelSelected = 'original text';
 
-  chunkMode = true;
+  chunkMode = false;
 
   @ViewChild(CdkVirtualScrollViewport, { static: false }) viewPort: CdkVirtualScrollViewport;
   timeStamp: { startMs: number, endMs: number }[] = [];
