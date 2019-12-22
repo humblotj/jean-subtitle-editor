@@ -1,6 +1,63 @@
 <mat-toolbar>
   <mat-tab-group mat-align-tabs="start">
-
+    <mat-tab label="Home">
+      <div fxLayoutAlign="start stretch">
+        <button mat-button (click)="onSave()">
+          <div fxLayout="column" fxLayoutAlign="center center">
+            <mat-icon svgIcon="content-save" style="margin-top: 8px;"></mat-icon>
+            <span style="font-size: smaller;margin-top: -10px;">Save Project</span>
+          </div>
+        </button>
+        <mat-divider [vertical]="true"></mat-divider>
+        <button mat-button (click)="onLoad()" [disabled]="!inputProjectKey">
+          <div fxLayout="column" fxLayoutAlign="center center">
+            <mat-icon svgIcon="file-download" style="margin-top: 8px;"></mat-icon>
+            <span style="font-size: smaller;margin-top: -10px;">Load Project</span>
+          </div>
+        </button>
+        <mat-form-field flexLayout="row" style="margin-right: 12px;margin-top:10px" [style.width.px]="150">
+          <input matInput #linkInput placeholder="Project Key" [(ngModel)]="inputProjectKey">
+          <button *ngIf="inputProjectKey" mat-icon-button matSuffix matTooltip="Clear" (click)="inputProjectKey=''">
+            <mat-icon svgIcon="close"></mat-icon>
+          </button>
+        </mat-form-field>
+        <button mat-icon-button (click)="copyURL(linkInput)" [disabled]="!inputProjectKey" matTooltip="Copy Key"
+          style="margin-top: 8px; margin-left: -15px;">
+          <mat-icon svgIcon="content-copy"></mat-icon>
+        </button>
+        <mat-divider [vertical]="true"></mat-divider>
+      </div>
+    </mat-tab>
+    <mat-tab label="Video">
+      <div fxLayoutAlign="start stretch">
+        <input hidden (change)="onOpenVideo($event)" #videoInput type="file"
+          accept="video/mp4,video/webm,video/ogg,audio/*">
+        <button mat-button (click)="videoInput.click()">
+          <div fxLayout="column" fxLayoutAlign="center center">
+            <mat-icon svgIcon="video-plus" style="margin-top: 8px;"></mat-icon>
+            <span style="font-size: smaller;margin-top: -10px;">Open Video</span>
+          </div>
+        </button>
+        <mat-divider [vertical]="true"></mat-divider>
+        <button mat-button (click)="onPlayYTLink()" [disabled]="!youtubeLink">
+          <div fxLayout="column" fxLayoutAlign="center center">
+            <mat-icon svgIcon="youtube" style="margin-top: 8px;"></mat-icon>
+            <span style="font-size: smaller;margin-top: -10px;">Play Video</span>
+          </div>
+        </button>
+        <mat-form-field flexLayout="row" style="margin-right: 12px;margin-top:10px" [style.width.px]="150">
+          <input matInput #linkInput placeholder="Youtube Link" [(ngModel)]="youtubeLink">
+          <button *ngIf="youtubeLink" mat-icon-button matSuffix matTooltip="Clear" (click)="youtubeLink=''">
+            <mat-icon svgIcon="close"></mat-icon>
+          </button>
+        </mat-form-field>
+        <button mat-icon-button (click)="copyURL(linkInput)" [disabled]="!youtubeLink" matTooltip="Copy URL"
+          style="margin-top: 8px; margin-left: -15px;">
+          <mat-icon svgIcon="content-copy"></mat-icon>
+        </button>
+        <mat-divider [vertical]="true"></mat-divider>
+      </div>
+    </mat-tab>
     <mat-tab label="Subtitle">
       <div fxLayoutAlign="start stretch">
         <div>
@@ -99,40 +156,11 @@
         <mat-divider [vertical]="true"></mat-divider>
       </div>
     </mat-tab>
-    <mat-tab label="Video">
-      <div fxLayoutAlign="start stretch">
-        <input hidden (change)="onOpenVideo($event)" #videoInput type="file"
-          accept="video/mp4,video/webm,video/ogg,audio/*">
-        <button mat-button (click)="videoInput.click()">
-          <div fxLayout="column" fxLayoutAlign="center center">
-            <mat-icon svgIcon="video-plus" style="margin-top: 8px;"></mat-icon>
-            <span style="font-size: smaller;margin-top: -10px;">Open Video</span>
-          </div>
-        </button>
-        <mat-divider [vertical]="true"></mat-divider>
-        <button mat-button (click)="onPlayYTLink()">
-          <div fxLayout="column" fxLayoutAlign="center center">
-            <mat-icon svgIcon="youtube" style="margin-top: 8px;"></mat-icon>
-            <span style="font-size: smaller;margin-top: -10px;">Play Video</span>
-          </div>
-        </button>
-        <mat-form-field flexLayout="row" style="margin-right: 12px;margin-top:10px" [style.width.px]="150">
-          <input matInput #linkInput placeholder="Youtube Link" [(ngModel)]="youtubeLink">
-          <button *ngIf="youtubeLink" mat-icon-button matSuffix matTooltip="Clear" (click)="youtubeLink=''">
-            <mat-icon svgIcon="close"></mat-icon>
-          </button>
-        </mat-form-field>
-        <button mat-icon-button (click)="copyURL(linkInput)" [disabled]="!youtubeLink" matTooltip="Copy URL"
-          style="margin-top: 8px; margin-left: -15px;">
-          <mat-icon svgIcon="content-copy"></mat-icon>
-        </button>
-        <mat-divider [vertical]="true"></mat-divider>
-      </div>
-    </mat-tab>
     <mat-tab label="Edit">
       <button mat-button (click)="onChunkMode()">
         <div fxLayout="column" fxLayoutAlign="center center">
-          <mat-icon svgIcon="format-horizontal-align-center" style="margin-top: 8px;"></mat-icon>
+          <mat-icon *ngIf="!chunkMode" svgIcon="format-horizontal-align-center" style="margin-top: 8px;"></mat-icon>
+          <mat-icon *ngIf="chunkMode" svgIcon="close-box" style="margin-top: 8px;"></mat-icon>
           <span style="font-size: smaller;margin-top: -10px;">Chunk Mode</span>
         </div>
       </button>

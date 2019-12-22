@@ -47,7 +47,6 @@ export class ScriptLineComponent implements OnInit, OnChanges {
       const regex = RegExp(/[\s|]+/g);
       let match = regex.exec(this.sentence);
       while (match != null) {
-        // separators.push({ separator: match[0], begin: match.index, end: regex.lastIndex });
         this.chunks.push(match[0].match(/\|/g) !== null);
         match = regex.exec(this.sentence);
       }

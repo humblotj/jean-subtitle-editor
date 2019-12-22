@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
+import { AngularFireStorageModule } from '@angular/fire/storage';
+import { AngularFireDatabaseModule } from '@angular/fire/database';
 
 import { SubtitleEditorComponent } from './subtitle-editor.component';
 import { SubtitleEditorRoutingModule } from './subtitle-editor-routing.module';
@@ -30,6 +32,8 @@ import { ScriptLineChunkComponent } from './script-line-chunk/script-line-chunk.
     HttpClientModule,
     SubtitleEditorRoutingModule,
     ScrollingModule,
+    AngularFireDatabaseModule,
+    AngularFireStorageModule,
   ]
 })
 export class SubtitleEditorModule { }

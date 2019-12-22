@@ -5,6 +5,8 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { MatMenuTrigger } from '@angular/material';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 import { DataStorageService } from './services/data-storage.service';
 import { ToolsService } from './services/tools.service';
@@ -18,10 +20,14 @@ import { MglishService } from './services/mglish.service';
   styleUrls: ['./subtitle-editor.component.css']
 })
 export class SubtitleEditorComponent implements OnInit {
+  projectKey = '';
+  lastSaveDate: Date = null;
+
   player = null;
   wavesurfer = null;
   url = '';
   videoType = '';
+  videoId = '';
   subtitleList: string[] = [];
 
   private repeatTimeout = null;
@@ -58,7 +64,10 @@ export class SubtitleEditorComponent implements OnInit {
   //   }
   // }
 
-  constructor(private http: HttpClient,
+  constructor(private route: ActivatedRoute,
+    private router: Router,
+    private location: Location,
+    private http: HttpClient,
     private dataStorageService: DataStorageService,
     private toolsService: ToolsService,
     private translateService: TranslateService,
@@ -66,9 +75,15 @@ export class SubtitleEditorComponent implements OnInit {
     private mglishService: MglishService) { }
 
   ngOnInit() {
+    const id = this.route.snapshot.queryParams.id;
+    if (typeof id !== 'undefined') {
+      this.projectKey = id;
+      this.onLoad(id);
+    }
   }
 
   videoSelected(file: File) {
+    this.videoId = '';
     this.videoType = file.type;
     const url = URL.createObjectURL(file);
     if (this.url !== url) {
@@ -78,6 +93,7 @@ export class SubtitleEditorComponent implements OnInit {
   }
 
   yTLinkPlayed(videoId: string) {
+    this.videoId = videoId;
     this.videoType = 'video/mp4';
     this.dataStorageService
       .storeVideo(videoId, videoId)
@@ -122,6 +138,7 @@ export class SubtitleEditorComponent implements OnInit {
   }
 
   subtitleSelected(data: any) {
+    this.projectKey = '';
     this.previousIndexActive = null;
     this.indexActive = null;
     this.timeStamp = data.map((line: any) => ({ startMs: line.startTime, endMs: line.endTime }));
@@ -576,6 +593,82 @@ export class SubtitleEditorComponent implements OnInit {
 
   chunkModeChanged(chunkMode: boolean) {
     this.chunkMode = chunkMode;
+    if (!chunkMode) {
+      const dataJSON = this.timeStamp.map((line, index: number) => {
+        return {
+          id: index,
+          start: line.startMs,
+          end: line.endMs,
+          text: this.script[index].replace(/\{(.*?)\}/gi, '').trim()
+        };
+      });
+      const dataFile = this.subtitleParserService.build(dataJSON, 'srt');
+      this.mglishService.getMglishSubtitles(dataFile).subscribe(
+        (result: any) => { this.preview = result; });
+    }
+  }
+
+  onSave() {
+    try {
+      this.projectKey = this.dataStorageService.storeData(
+        this.projectKey, 'Subtitle', this.timeStamp, this.script, this.scriptTranslation, this.videoId);
+      this.lastSaveDate = new Date();
+      this.changeURL();
+      this.toolsService.openSnackBar('Project Saved', 2000);
+
+    } catch (error) {
+      console.error(error);
+      this.toolsService.openSnackBar('Save Failed', 2000);
+    }
+  }
+
+  changeURL() {
+    let urlTree;
+    if (this.projectKey !== '' && this.projectKey !== this.route.snapshot.queryParams.id) {
+      urlTree = this.router.createUrlTree([], {
+        relativeTo: this.route,
+        queryParams: {
+          id: this.projectKey
+        },
+        replaceUrl: true,
+      }).toString();
+      this.location.go(urlTree);
+    } else {
+      if (this.projectKey === '') {
+        urlTree = this.router.createUrlTree([], {
+          relativeTo: this.route,
+          replaceUrl: true,
+        }).toString();
+        this.location.go(urlTree);
+      }
+    }
+  }
+
+  onLoad(id: string) {
+    this.dataStorageService.getData(id).pipe(take(1)).subscribe((data: any) => {
+      if (data === null) {
+        this.toolsService.openSnackBar('Wrong Project Key', 2000);
+      } else {
+        this.indexActive = 0;
+        this.projectKey = id;
+        // this.name = data.name;
+        this.timeStamp = data.timeStamp;
+        this.script = data.script;
+        this.scriptTranslation = data.scriptTranslation;
+        this.yTLinkPlayed(data.videoId);
+        const dataJSON = this.timeStamp.map((line, index: number) => {
+          return {
+            id: index,
+            start: line.startMs,
+            end: line.endMs,
+            text: this.script[index].replace(/\{(.*?)\}/gi, '').trim()
+          };
+        });
+        const dataFile = this.subtitleParserService.build(dataJSON, 'srt');
+        this.mglishService.getMglishSubtitles(dataFile).subscribe(
+          (result: any) => { this.preview = result; });
+      }
+    });
   }
 
 }

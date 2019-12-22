@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Output, EventEmitter, Input, SimpleChanges, OnChanges } from '@angular/core';
 
 import { ToolsService } from '../services/tools.service';
 import { SubtitleParserService } from '../services/subtitle-parser.service';
@@ -10,7 +10,7 @@ import { HttpParams, HttpClient } from '@angular/common/http';
   styleUrls: ['./toolbar.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class ToolbarComponent implements OnInit {
+export class ToolbarComponent implements OnInit, OnChanges {
   @Output() videoSelected: EventEmitter<File> = new EventEmitter();
   @Output() yTLinkPlayed: EventEmitter<string> = new EventEmitter();
   @Output() subtitleSelected: EventEmitter<any> = new EventEmitter();
@@ -18,10 +18,14 @@ export class ToolbarComponent implements OnInit {
   @Output() translate: EventEmitter<{ sourceLanguage: string, targetLanguage: string }> = new EventEmitter();
   @Output() export: EventEmitter<{ extensionExport: string, script: boolean }> = new EventEmitter();
   @Output() chunkModeChanged: EventEmitter<boolean> = new EventEmitter();
+  @Output() save: EventEmitter<null> = new EventEmitter();
+  @Output() load: EventEmitter<string> = new EventEmitter();
   @Input() subtitleList: { name: string, lang_code: string, lang_translated: string }[];
+  @Input() projectKey: string;
+  @Input() videoId: string;
 
+  inputProjectKey = '';
   youtubeLink = '';
-  private videoId = '';
 
   languagesSupported = [
     { value: 'ko', viewValue: 'Korean' },
@@ -44,11 +48,22 @@ export class ToolbarComponent implements OnInit {
     'xlsx'
   ];
 
-  private chunkMode = false;
+  chunkMode = false;
 
   constructor(private toolsService: ToolsService, private subtitleParserService: SubtitleParserService, private http: HttpClient) { }
 
   ngOnInit() {
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.projectKey) {
+      this.inputProjectKey = this.projectKey;
+    }
+    if (changes.videoId) {
+      if (this.videoId !== '' && !this.youtubeLink.includes(this.videoId)) {
+        this.youtubeLink = 'https://www.youtube.com/watch?v=' + this.videoId;
+      }
+    }
   }
 
   onOpenVideo(event: any) {
@@ -56,7 +71,6 @@ export class ToolbarComponent implements OnInit {
     if (file != null) {
       const type: string = file.type;
       if (type === 'video/mp4' || type === 'video/webm' || type === 'video/ogg' || type.startsWith('audio/')) {
-        this.videoId = '';
         this.videoSelected.emit(file);
       }
     }
@@ -64,13 +78,14 @@ export class ToolbarComponent implements OnInit {
 
   onPlayYTLink() {
     if (this.isYoutubeLink()) {
+      let videoId: string;
       if (this.youtubeLink.startsWith('https://www.youtube.com/watch?v=')) {
         const url: any = new URL(this.youtubeLink);
-        this.videoId = url.searchParams.get('v');
+        videoId = url.searchParams.get('v');
       } else {
-        this.videoId = this.youtubeLink.substring(17);
+        videoId = this.youtubeLink.substring(17);
       }
-      this.yTLinkPlayed.emit(this.videoId);
+      this.yTLinkPlayed.emit(videoId);
     } else {
       this.toolsService.openSnackBar('This is not a YouTube link.', 2000);
     }
@@ -189,5 +204,13 @@ export class ToolbarComponent implements OnInit {
   onChunkMode() {
     this.chunkMode = !this.chunkMode;
     this.chunkModeChanged.next(this.chunkMode);
+  }
+
+  onSave() {
+    this.save.next(null);
+  }
+
+  onLoad() {
+    this.load.next(this.inputProjectKey);
   }
 }

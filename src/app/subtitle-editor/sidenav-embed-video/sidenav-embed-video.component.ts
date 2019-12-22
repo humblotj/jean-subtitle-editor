@@ -51,7 +51,8 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
       }
       if (changes.indexActive.previousValue !== null) {
         const previousIndex = changes.indexActive.previousValue;
-        if (this.preview[previousIndex].en.replace(/\{(.*?)\}/gi, '') !== this.script[previousIndex]) {
+        if (typeof this.preview !== 'undefined'
+          && this.preview[previousIndex].en.replace(/\{(.*?)\}/gi, '') !== this.script[previousIndex]) {
           const subtitleBuild = this.subtitleParserService.build([{
             id: previousIndex,
             start: 0,
@@ -62,6 +63,8 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
             (result: any) => {
               this.preview[previousIndex].en = result[0].en;
               this.preview[previousIndex].ko = result[0].ko;
+              this.topText = this.preview[this.indexActive].en;
+              this.bottomText = this.preview[this.indexActive].ko;
             });
         }
       }

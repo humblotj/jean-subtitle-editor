@@ -27,6 +27,6 @@
     </div>
   </div>
   <app-detail-sentence-renderer [topText]="topText" [bottomText]="bottomText"></app-detail-sentence-renderer>
-  <hr style="border-top: 1px solid #ddd">
+  <hr *ngIf="script.length" style="border-top: 1px solid #ddd">
   <div style="padding: 12px 16px; font-size: 16px; color: rgba(80,80,80,0.64)">{{scriptTranslation[indexActive]}}</div>
 </div>
