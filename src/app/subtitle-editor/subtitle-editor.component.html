@@ -1,7 +1,10 @@
-<app-toolbar [subtitleList]="subtitleList" [projectKey]="projectKey" [videoId]="videoId" (videoSelected)="videoSelected($event)"
+<app-toolbar [subtitleList]="subtitleList" [projectKey]="projectKey" [videoId]="videoId" [projectName]="projectName"
+  [hasScript]="script.length === 0" [showUndo]="showUndo" [showRedo]="showRedo" (videoSelected)="videoSelected($event)"
   (yTLinkPlayed)="yTLinkPlayed($event)" (subtitleSelected)="subtitleSelected($event)"
   (translationSelected)="translationSelected($event)" (translate)="translate($event)"
-  (chunkModeChanged)="chunkModeChanged($event)" (save)="onSave()" (load)="onLoad($event)">
+  (chunkModeChanged)="chunkModeChanged($event)" (save)="onSave()" (load)="onLoad($event)"
+  (projectNameChanged)="onProjectNameChanged($event)" (autoChunk)="onAutoChunk()" (undoEmit)="undo()"
+  (redoEmit)="redo()">
 </app-toolbar>
 <mat-sidenav-container class=" sidenav-container">
   <mat-sidenav mode="side" opened class="sidenav">

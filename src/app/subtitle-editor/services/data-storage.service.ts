@@ -22,12 +22,12 @@ export class DataStorageService {
     return this.http.post(url, '', { params });
   }
 
-  storeData(id: string, name: string, timeStamp: { startMs: number, endMs: number }[],
+  storeData(id: string, projectName: string, timeStamp: { startMs: number, endMs: number }[],
     script: string[], scriptTranslation: string[], videoId: string) {
     if (id === '') {
       id = this.db.createPushId();
     }
-    const data = { videoId, name, timeStamp, script, scriptTranslation };
+    const data = { videoId, projectName, timeStamp, script, scriptTranslation };
 
     this.itemsRef.set(id, data);
     return id;

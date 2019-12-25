@@ -1,169 +1,285 @@
 <mat-toolbar>
   <mat-tab-group mat-align-tabs="start">
     <mat-tab label="Home">
-      <div fxLayoutAlign="start stretch">
-        <button mat-button (click)="onSave()">
-          <div fxLayout="column" fxLayoutAlign="center center">
-            <mat-icon svgIcon="content-save" style="margin-top: 8px;"></mat-icon>
-            <span style="font-size: smaller;margin-top: -10px;">Save Project</span>
-          </div>
-        </button>
-        <mat-divider [vertical]="true"></mat-divider>
-        <button mat-button (click)="onLoad()" [disabled]="!inputProjectKey">
-          <div fxLayout="column" fxLayoutAlign="center center">
-            <mat-icon svgIcon="file-download" style="margin-top: 8px;"></mat-icon>
-            <span style="font-size: smaller;margin-top: -10px;">Load Project</span>
-          </div>
-        </button>
-        <mat-form-field flexLayout="row" style="margin-right: 12px;margin-top:10px" [style.width.px]="150">
-          <input matInput #linkInput placeholder="Project Key" [(ngModel)]="inputProjectKey">
-          <button *ngIf="inputProjectKey" mat-icon-button matSuffix matTooltip="Clear" (click)="inputProjectKey=''">
-            <mat-icon svgIcon="close"></mat-icon>
+      <div fxLayoutAlign="space-between">
+        <div fxLayoutAlign="start stretch">
+          <button mat-button (click)="onLoad()" [disabled]="!inputProjectKey">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="file-download" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Load Project</span>
+            </div>
           </button>
-        </mat-form-field>
-        <button mat-icon-button (click)="copyURL(linkInput)" [disabled]="!inputProjectKey" matTooltip="Copy Key"
-          style="margin-top: 8px; margin-left: -15px;">
-          <mat-icon svgIcon="content-copy"></mat-icon>
-        </button>
-        <mat-divider [vertical]="true"></mat-divider>
+          <mat-form-field flexLayout="row" style="margin-right: 12px;margin-top:10px" [style.width.px]="150">
+            <input matInput #keyInput placeholder="Project Key" [(ngModel)]="inputProjectKey">
+            <button *ngIf="inputProjectKey" mat-icon-button matSuffix matTooltip="Clear" (click)="inputProjectKey=''">
+              <mat-icon svgIcon="close"></mat-icon>
+            </button>
+          </mat-form-field>
+          <button mat-icon-button (click)="copyInput(keyInput)" [disabled]="!inputProjectKey" matTooltip="Copy Key"
+            style="margin-top: 8px; margin-left: -15px;">
+            <mat-icon svgIcon="content-copy"></mat-icon>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+          <mat-form-field flexLayout="row" style="margin-left: 12px; margin-right: 12px;margin-top:10px"
+            [style.width.px]="150">
+            <input matInput #nameInput placeholder="Project Name" [ngModel]="projectName"
+              (ngModelChange)="onProjectNameChanged($event)">
+            <button *ngIf="projectName" mat-icon-button matSuffix matTooltip="Clear" (click)="onProjectNameChanged('')">
+              <mat-icon svgIcon="close"></mat-icon>
+            </button>
+          </mat-form-field>
+          <button mat-icon-button (click)="copyInput(nameInput)" [disabled]="!projectName" matTooltip="Copy Name"
+            style="margin-top: 8px; margin-left: -15px;">
+            <mat-icon svgIcon="content-copy"></mat-icon>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+        </div>
+        <div fxLayoutAlign="start stretch">
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="onSave()" [disabled]="hasScript">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="content-save" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Save Project</span>
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="undo()" [disabled]="!showUndo">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="undo" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Undo</span>
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="redo()" [disabled]="!showRedo">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="redo" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Redo</span>
+            </div>
+          </button>
+        </div>
       </div>
     </mat-tab>
     <mat-tab label="Video">
-      <div fxLayoutAlign="start stretch">
-        <input hidden (change)="onOpenVideo($event)" #videoInput type="file"
-          accept="video/mp4,video/webm,video/ogg,audio/*">
-        <button mat-button (click)="videoInput.click()">
-          <div fxLayout="column" fxLayoutAlign="center center">
-            <mat-icon svgIcon="video-plus" style="margin-top: 8px;"></mat-icon>
-            <span style="font-size: smaller;margin-top: -10px;">Open Video</span>
-          </div>
-        </button>
-        <mat-divider [vertical]="true"></mat-divider>
-        <button mat-button (click)="onPlayYTLink()" [disabled]="!youtubeLink">
-          <div fxLayout="column" fxLayoutAlign="center center">
-            <mat-icon svgIcon="youtube" style="margin-top: 8px;"></mat-icon>
-            <span style="font-size: smaller;margin-top: -10px;">Play Video</span>
-          </div>
-        </button>
-        <mat-form-field flexLayout="row" style="margin-right: 12px;margin-top:10px" [style.width.px]="150">
-          <input matInput #linkInput placeholder="Youtube Link" [(ngModel)]="youtubeLink">
-          <button *ngIf="youtubeLink" mat-icon-button matSuffix matTooltip="Clear" (click)="youtubeLink=''">
-            <mat-icon svgIcon="close"></mat-icon>
+      <div fxLayoutAlign="space-between">
+        <div fxLayoutAlign="start stretch">
+          <input hidden (change)="onOpenVideo($event)" #videoInput type="file"
+            accept="video/mp4,video/webm,video/ogg,audio/*">
+          <button mat-button (click)="videoInput.click()">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="video-plus" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Open Video</span>
+            </div>
           </button>
-        </mat-form-field>
-        <button mat-icon-button (click)="copyURL(linkInput)" [disabled]="!youtubeLink" matTooltip="Copy URL"
-          style="margin-top: 8px; margin-left: -15px;">
-          <mat-icon svgIcon="content-copy"></mat-icon>
-        </button>
-        <mat-divider [vertical]="true"></mat-divider>
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="onPlayYTLink()" [disabled]="!youtubeLink">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="youtube" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Play Video</span>
+            </div>
+          </button>
+          <mat-form-field flexLayout="row" style="margin-right: 12px;margin-top:10px" [style.width.px]="150">
+            <input matInput #linkInput placeholder="Youtube Link" [(ngModel)]="youtubeLink">
+            <button *ngIf="youtubeLink" mat-icon-button matSuffix matTooltip="Clear" (click)="youtubeLink=''">
+              <mat-icon svgIcon="close"></mat-icon>
+            </button>
+          </mat-form-field>
+          <button mat-icon-button (click)="copyInput(linkInput)" [disabled]="!youtubeLink" matTooltip="Copy URL"
+            style="margin-top: 8px; margin-left: -15px;">
+            <mat-icon svgIcon="content-copy"></mat-icon>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+        </div>
+        <div fxLayoutAlign="start stretch">
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="onSave()" [disabled]="hasScript">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="content-save" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Save Project</span>
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="undo()" [disabled]="!showUndo">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="undo" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Undo</span>
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="redo()" [disabled]="!showRedo">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="redo" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Redo</span>
+            </div>
+          </button>
+        </div>
       </div>
     </mat-tab>
     <mat-tab label="Subtitle">
-      <div fxLayoutAlign="start stretch">
-        <div>
-          <button mat-button [matMenuTriggerFor]="menu">
+      <div fxLayoutAlign="space-between">
+        <div fxLayoutAlign="start stretch">
+          <div>
+            <button mat-button [matMenuTriggerFor]="menu">
+              <div fxLayout="column" fxLayoutAlign="center center">
+                <mat-icon svgIcon="subtitles-outline" style="margin-top: 8px;"></mat-icon>
+                <span style="font-size: smaller;margin-top: -10px;">Select Subtitle</span>
+              </div>
+            </button>
+            <mat-menu #menu="matMenu">
+              <input hidden (change)="onSubtitleFileSelected($event)" #subtitleInput type="file"
+                accept=".srt,.sbv,.ass, .mss, .txt, .xlsx">
+              <button mat-menu-item (click)="subtitleInput.click();subtitleInput.value=null"
+                matTooltip="format supported: .srt,.sbv,.ass, .mss, .txt, .xlsx">
+                <mat-icon svgIcon="folder"></mat-icon>
+                <span>from files</span>
+              </button>
+              <button mat-menu-item disabled="true">
+                <mat-icon svgIcon="text-to-speech"></mat-icon>
+                <span>generate from audio</span>
+              </button>
+              <button mat-menu-item *ngFor="let subtitle of subtitleList" (click)="onSubtitleSelected(subtitle)">
+                {{subtitle.lang_translated}}
+              </button>
+            </mat-menu>
+            <button mat-button [matMenuTriggerFor]="menuTranslation">
+              <div fxLayout="column" fxLayoutAlign="center center">
+                <mat-icon svgIcon="subtitles" style="margin-top: 8px;"></mat-icon>
+                <span style="font-size: smaller;margin-top: -10px;">Select Translation</span>
+              </div>
+            </button>
+            <mat-menu #menuTranslation="matMenu">
+              <input hidden (change)="onTranslationFileSelected($event)" #translationInput type="file"
+                accept=".srt,.sbv,.ass,.mss,.txt">
+              <button mat-menu-item (click)="translationInput.click();translationInput.value=null"
+                matTooltip="format supported: .srt,.sbv,.ass,.mss,.txt">
+                <mat-icon svgIcon="folder"></mat-icon>
+                <span>from files</span>
+              </button>
+              <button mat-menu-item *ngFor="let subtitle of subtitleList" (click)="onTranslationSelected(subtitle)">
+                {{subtitle.lang_translated}}
+              </button>
+            </mat-menu>
+          </div>
+          <mat-divider [vertical]="true"></mat-divider>
+          <div fxLayoutAlign="center center" style="margin-right: 12px;">
+            <button mat-button (click)="onTranslate()" [disabled]="hasScript">
+              <div fxLayout="column" fxLayoutAlign="center center">
+                <mat-icon svgIcon="translate" style="margin-top: 8px;"></mat-icon>
+                <span style="font-size: smaller;margin-top: -10px;">Translate</span>
+              </div>
+            </button>
+            <mat-form-field [style.width.px]="100">
+              <mat-select [(value)]="sourceLanguage" (focus)="setOldSourceLanguage()"
+                (selectionChange)="onSLSelected($event)">
+                <mat-option *ngFor="let language of languagesSupported" [value]="language.value">
+                  {{language.viewValue}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button mat-icon-button (click)="swapLanguages()">
+              <mat-icon svgIcon="swap-horizontal"></mat-icon>
+            </button>
+            <mat-form-field [style.width.px]="100">
+              <mat-select [(value)]="targetLanguage" (focus)="setOldTargetLanguage()"
+                (selectionChange)="onTLSelected($event)">
+                <mat-option *ngFor="let language of languagesSupported" [value]="language.value">
+                  {{language.viewValue}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button [matMenuTriggerFor]="menuExportSubtitle" [disabled]="hasScript">
             <div fxLayout="column" fxLayoutAlign="center center">
               <mat-icon svgIcon="subtitles-outline" style="margin-top: 8px;"></mat-icon>
-              <span style="font-size: smaller;margin-top: -10px;">Select Subtitle</span>
+              <span style="font-size: smaller;margin-top: -10px;">Export Subtitle</span>
             </div>
           </button>
-          <mat-menu #menu="matMenu">
-            <input hidden (change)="onSubtitleFileSelected($event)" #subtitleInput type="file"
-              accept=".srt,.sbv,.ass, .mss, .txt, .xlsx">
-            <button mat-menu-item (click)="subtitleInput.click();subtitleInput.value=null"
-              matTooltip="format supported: .srt,.sbv,.ass, .mss, .txt, .xlsx">
-              <mat-icon svgIcon="folder"></mat-icon>
-              <span>from files</span>
-            </button>
-            <button mat-menu-item disabled="true">
-              <mat-icon svgIcon="text-to-speech"></mat-icon>
-              <span>generate from audio</span>
-            </button>
-            <button mat-menu-item *ngFor="let subtitle of subtitleList" (click)="onSubtitleSelected(subtitle)">
-              {{subtitle.lang_translated}}
+          <mat-menu #menuExportSubtitle="matMenu">
+            <button mat-menu-item *ngFor="let extension of extensions" (click)="onExportSubtitle(extension)">
+              as .{{extension}}
             </button>
           </mat-menu>
-          <button mat-button [matMenuTriggerFor]="menuTranslation">
+          <button mat-button [matMenuTriggerFor]="menuExport" [disabled]="hasScript">
             <div fxLayout="column" fxLayoutAlign="center center">
               <mat-icon svgIcon="subtitles" style="margin-top: 8px;"></mat-icon>
-              <span style="font-size: smaller;margin-top: -10px;">Select Translation</span>
+              <span style="font-size: smaller;margin-top: -10px;">Export Translation</span>
             </div>
           </button>
-          <mat-menu #menuTranslation="matMenu">
-            <input hidden (change)="onTranslationFileSelected($event)" #translationInput type="file"
-              accept=".srt,.sbv,.ass,.mss,.txt">
-            <button mat-menu-item (click)="translationInput.click();translationInput.value=null"
-              matTooltip="format supported: .srt,.sbv,.ass,.mss,.txt">
-              <mat-icon svgIcon="folder"></mat-icon>
-              <span>from files</span>
-            </button>
-            <button mat-menu-item *ngFor="let subtitle of subtitleList" (click)="onTranslationSelected(subtitle)">
-              {{subtitle.lang_translated}}
+          <mat-menu #menuExport="matMenu">
+            <button mat-menu-item *ngFor="let extension of extensions" (click)="onExportTranslation(extension)">
+              as .{{extension}}
             </button>
           </mat-menu>
+          <mat-divider [vertical]="true"></mat-divider>
         </div>
-        <mat-divider [vertical]="true"></mat-divider>
-        <div fxLayoutAlign="center center" style="margin-right: 12px;">
-          <button mat-button (click)="onTranslate()">
+        <div fxLayoutAlign="start stretch">
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="onSave()" [disabled]="hasScript">
             <div fxLayout="column" fxLayoutAlign="center center">
-              <mat-icon svgIcon="translate" style="margin-top: 8px;"></mat-icon>
-              <span style="font-size: smaller;margin-top: -10px;">Translate</span>
+              <mat-icon svgIcon="content-save" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Save Project</span>
             </div>
           </button>
-          <mat-form-field [style.width.px]="100">
-            <mat-select [(value)]="sourceLanguage" (focus)="setOldSourceLanguage()"
-              (selectionChange)="onSLSelected($event)">
-              <mat-option *ngFor="let language of languagesSupported" [value]="language.value">
-                {{language.viewValue}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-          <button mat-icon-button (click)="swapLanguages()">
-            <mat-icon svgIcon="swap-horizontal"></mat-icon>
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="undo()" [disabled]="!showUndo">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="undo" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Undo</span>
+            </div>
           </button>
-          <mat-form-field [style.width.px]="100">
-            <mat-select [(value)]="targetLanguage" (focus)="setOldTargetLanguage()"
-              (selectionChange)="onTLSelected($event)">
-              <mat-option *ngFor="let language of languagesSupported" [value]="language.value">
-                {{language.viewValue}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="redo()" [disabled]="!showRedo">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="redo" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Redo</span>
+            </div>
+          </button>
         </div>
-        <mat-divider [vertical]="true"></mat-divider>
-        <button mat-button [matMenuTriggerFor]="menuExportSubtitle">
-          <div fxLayout="column" fxLayoutAlign="center center">
-            <mat-icon svgIcon="subtitles-outline" style="margin-top: 8px;"></mat-icon>
-            <span style="font-size: smaller;margin-top: -10px;">Export Subtitle</span>
-          </div>
-        </button>
-        <mat-menu #menuExportSubtitle="matMenu">
-          <button mat-menu-item *ngFor="let extension of extensions" (click)="onExportSubtitle(extension)">
-            as .{{extension}}
-          </button>
-        </mat-menu>
-        <button mat-button [matMenuTriggerFor]="menuExport">
-          <div fxLayout="column" fxLayoutAlign="center center">
-            <mat-icon svgIcon="subtitles" style="margin-top: 8px;"></mat-icon>
-            <span style="font-size: smaller;margin-top: -10px;">Export Translation</span>
-          </div>
-        </button>
-        <mat-menu #menuExport="matMenu">
-          <button mat-menu-item *ngFor="let extension of extensions" (click)="onExportTranslation(extension)">
-            as .{{extension}}
-          </button>
-        </mat-menu>
-        <mat-divider [vertical]="true"></mat-divider>
       </div>
     </mat-tab>
     <mat-tab label="Edit">
-      <button mat-button (click)="onChunkMode()">
-        <div fxLayout="column" fxLayoutAlign="center center">
-          <mat-icon *ngIf="!chunkMode" svgIcon="format-horizontal-align-center" style="margin-top: 8px;"></mat-icon>
-          <mat-icon *ngIf="chunkMode" svgIcon="close-box" style="margin-top: 8px;"></mat-icon>
-          <span style="font-size: smaller;margin-top: -10px;">Chunk Mode</span>
+      <div fxLayoutAlign="space-between">
+        <div fxLayoutAlign="start stretch">
+          <button mat-button (click)="onChunkMode()" [disabled]="hasScript">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon *ngIf="!chunkMode" svgIcon="format-horizontal-align-center" style="margin-top: 8px;"></mat-icon>
+              <mat-icon *ngIf="chunkMode" svgIcon="close-box" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Chunk Mode</span>
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="onAutoChunk()" [disabled]="hasScript||chunkMode">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="atom-variant" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Auto Chunk</span>
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
         </div>
-      </button>
+        <div fxLayoutAlign="start stretch">
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="onSave()" [disabled]="hasScript">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="content-save" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Save Project</span>
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="undo()" [disabled]="!showUndo">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="undo" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Undo</span>
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="redo()" [disabled]="!showRedo">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="redo" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Redo</span>
+            </div>
+          </button>
+        </div>
+      </div>
     </mat-tab>
   </mat-tab-group>
 </mat-toolbar>

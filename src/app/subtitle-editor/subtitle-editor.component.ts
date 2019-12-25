@@ -13,6 +13,7 @@ import { ToolsService } from './services/tools.service';
 import { TranslateService } from './services/translate.service';
 import { SubtitleParserService } from './services/subtitle-parser.service';
 import { MglishService } from './services/mglish.service';
+import { MglishnlService } from './services/mglishnl.service';
 
 @Component({
   selector: 'app-subtitle-editor',
@@ -21,6 +22,7 @@ import { MglishService } from './services/mglish.service';
 })
 export class SubtitleEditorComponent implements OnInit {
   projectKey = '';
+  projectName = 'Subtitle';
   lastSaveDate: Date = null;
 
   player = null;
@@ -49,6 +51,12 @@ export class SubtitleEditorComponent implements OnInit {
   @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
   contextMenuPosition = { x: '0px', y: '0px' };
 
+  dataUndoArray: Array<{ timeStamp: { startMs: number, endMs: number }[], script: string[], scriptTranslation: string[] }> = [];
+  dataRedoArray: Array<{ timeStamp: { startMs: number, endMs: number }[], script: string[], scriptTranslation: string[] }> = [];
+  undoLimit = 5;
+  showUndo = false;
+  showRedo = false;
+
   // @HostListener('keydown', ['$event'])
   // keyEvent(event: KeyboardEvent) {
   //   if (event.key === 'ArrowUp') {
@@ -72,7 +80,8 @@ export class SubtitleEditorComponent implements OnInit {
     private toolsService: ToolsService,
     private translateService: TranslateService,
     private subtitleParserService: SubtitleParserService,
-    private mglishService: MglishService) { }
+    private mglishService: MglishService,
+    private mglishNLService: MglishnlService) { }
 
   ngOnInit() {
     const id = this.route.snapshot.queryParams.id;
@@ -198,6 +207,7 @@ export class SubtitleEditorComponent implements OnInit {
     if (this.script.length === 0) {
       this.toolsService.openSnackBar('Select Subtitle First', 2000);
     } else {
+      this.do();
       let scriptTranslation: string[] = [];
       for (let i = 0; i < this.timeStamp.length; i++) {
         scriptTranslation[i] = '';
@@ -256,7 +266,7 @@ export class SubtitleEditorComponent implements OnInit {
       }
     }
     const lang = event.script ? 'ko' : 'en';
-    FileSaver.saveAs(blob, 'subtitle' + '_export_' + lang + '.' + event.extensionExport);
+    FileSaver.saveAs(blob, this.projectName + lang + '.' + event.extensionExport);
   }
 
   playerInitialized(player: any) {
@@ -534,16 +544,19 @@ export class SubtitleEditorComponent implements OnInit {
   }
 
   deleteRow(index: number) {
+    this.do();
     if (this.indexActive === this.timeStamp.length - 1) {
       this.setIndexActive(this.indexActive === 0 ? 0 : this.indexActive - 1);
     }
     this.timeStamp.splice(index, 1);
     this.script.splice(index, 1);
     this.scriptTranslation.splice(index, 1);
+
     this.timeStamp = this.timeStamp.slice();
   }
 
   insertNext(index: number) {
+    this.do();
     const start = this.timeStamp[index].endMs;
     let end = index === this.timeStamp.length - 1 ?
       this.timeStamp[index].endMs : this.timeStamp[index + 1].startMs;
@@ -553,10 +566,13 @@ export class SubtitleEditorComponent implements OnInit {
     this.timeStamp.splice(index + 1, 0, { startMs: start, endMs: end });
     this.script.splice(index + 1, 0, '');
     this.scriptTranslation.splice(index + 1, 0, '');
+
+    this.timeStamp = this.timeStamp.slice();
   }
 
 
   duplicate(index: number) {
+    this.do();
     let start = this.timeStamp[index].startMs + (this.timeStamp[index].endMs - this.timeStamp[index].startMs) / 2;
     start = +start.toFixed(2);
     const end = this.timeStamp[index].endMs;
@@ -564,9 +580,12 @@ export class SubtitleEditorComponent implements OnInit {
     this.timeStamp.splice(index + 1, 0, { startMs: start, endMs: end });
     this.script.splice(index + 1, 0, this.script[index]);
     this.scriptTranslation.splice(index + 1, 0, this.scriptTranslation[index]);
+
+    this.timeStamp = this.timeStamp.slice();
   }
 
   merge(index: number) {
+    this.do();
     if (this.indexActive === this.timeStamp.length - 1) {
       this.setIndexActive(this.indexActive === 0 ? 0 : this.indexActive - 1);
     }
@@ -578,15 +597,18 @@ export class SubtitleEditorComponent implements OnInit {
     this.scriptTranslation[index] =
       (this.scriptTranslation[index].trim() + ' ' + this.scriptTranslation[index + 1]).trim();
     this.scriptTranslation.splice(index + 1, 1);
+
     this.timeStamp = this.timeStamp.slice();
   }
 
   deleteLeft(index: number) {
+    this.do();
     this.script.splice(index, 1);
     this.script[this.script.length] = '';
   }
 
   deleteRight(index: number) {
+    this.do();
     this.scriptTranslation.splice(index, 1);
     this.scriptTranslation[this.script.length] = '';
   }
@@ -611,7 +633,7 @@ export class SubtitleEditorComponent implements OnInit {
   onSave() {
     try {
       this.projectKey = this.dataStorageService.storeData(
-        this.projectKey, 'Subtitle', this.timeStamp, this.script, this.scriptTranslation, this.videoId);
+        this.projectKey, this.projectName, this.timeStamp, this.script, this.scriptTranslation, this.videoId);
       this.lastSaveDate = new Date();
       this.changeURL();
       this.toolsService.openSnackBar('Project Saved', 2000);
@@ -651,7 +673,7 @@ export class SubtitleEditorComponent implements OnInit {
       } else {
         this.indexActive = 0;
         this.projectKey = id;
-        // this.name = data.name;
+        this.projectName = data.projectName;
         this.timeStamp = data.timeStamp;
         this.script = data.script;
         this.scriptTranslation = data.scriptTranslation;
@@ -669,6 +691,81 @@ export class SubtitleEditorComponent implements OnInit {
           (result: any) => { this.preview = result; });
       }
     });
+  }
+
+  onProjectNameChanged(name: string) {
+    this.projectName = name;
+  }
+
+  onAutoChunk() {
+    this.mglishNLService.chunkTextArray(this.script).subscribe(
+      (result: string[]) => {
+        this.do();
+        const oldLength = this.script.length;
+        this.script = result;
+        for (let i = this.script.length; i < oldLength; i++) {
+          this.script[i] = '';
+        }
+      },
+      error => {
+        console.error(error);
+      });
+  }
+
+  do(): void {
+    this.dataRedoArray = [];
+    this.showRedo = false;
+
+    if (this.dataUndoArray.length === this.undoLimit) {
+      this.dataUndoArray.reverse().pop();
+      this.dataUndoArray.reverse();
+    }
+    this.dataUndoArray.push(
+      { timeStamp: this.timeStamp.slice(), script: this.script.slice(), scriptTranslation: this.scriptTranslation.slice() });
+    this.showUndo = true;
+  }
+
+  undo() {
+    this.showRedo = true;
+    if (this.dataUndoArray.length !== 0) {
+      this.dataRedoArray.push(
+        { timeStamp: this.timeStamp.slice(), script: this.script.slice(), scriptTranslation: this.scriptTranslation.slice() });
+      const currentData = this.dataUndoArray.pop();
+      this.timeStamp = currentData.timeStamp;
+      this.script = currentData.script;
+      this.scriptTranslation = currentData.scriptTranslation;
+
+      if (this.dataUndoArray.length === 0) {
+        this.showUndo = false;
+      }
+      if (this.indexActive > this.timeStamp.length - 1) {
+        this.indexActive = this.timeStamp.length - 1;
+      }
+    }
+  }
+
+  redo() {
+    if (this.dataRedoArray.length !== 0) {
+      this.dataUndoArray.push(
+        { timeStamp: this.timeStamp.slice(), script: this.script.slice(), scriptTranslation: this.scriptTranslation.slice() });
+      const currentData = this.dataRedoArray.pop();
+      this.timeStamp = currentData.timeStamp.slice();
+      this.script = currentData.script;
+      this.scriptTranslation = currentData.scriptTranslation;
+
+      if (this.dataRedoArray.length === 0) {
+        this.showRedo = false;
+      }
+      if (this.indexActive > this.timeStamp.length - 1) {
+        this.indexActive = this.timeStamp.length - 1;
+      }
+    }
+
+    if (this.dataUndoArray.length > 0) {
+      this.showUndo = true;
+    } else {
+      this.showUndo = false;
+    }
   }
 
 }

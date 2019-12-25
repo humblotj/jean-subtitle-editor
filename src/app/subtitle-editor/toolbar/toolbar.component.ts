@@ -20,9 +20,19 @@ export class ToolbarComponent implements OnInit, OnChanges {
   @Output() chunkModeChanged: EventEmitter<boolean> = new EventEmitter();
   @Output() save: EventEmitter<null> = new EventEmitter();
   @Output() load: EventEmitter<string> = new EventEmitter();
+  @Output() projectNameChanged: EventEmitter<string> = new EventEmitter();
+  @Output() autoChunk: EventEmitter<null> = new EventEmitter();
+  @Output() undoEmit: EventEmitter<null> = new EventEmitter();
+  @Output() redoEmit: EventEmitter<null> = new EventEmitter();
+
   @Input() subtitleList: { name: string, lang_code: string, lang_translated: string }[];
+  @Input() hasScript: boolean;
+  @Input() projectName: string;
   @Input() projectKey: string;
   @Input() videoId: string;
+  @Input() showUndo: boolean;
+  @Input() showRedo: boolean;
+
 
   inputProjectKey = '';
   youtubeLink = '';
@@ -98,7 +108,7 @@ export class ToolbarComponent implements OnInit, OnChanges {
     );
   }
 
-  copyURL(el: any) {
+  copyInput(el: any) {
     this.toolsService.copyInput(el);
   }
 
@@ -206,11 +216,27 @@ export class ToolbarComponent implements OnInit, OnChanges {
     this.chunkModeChanged.next(this.chunkMode);
   }
 
+  onAutoChunk() {
+    this.autoChunk.next();
+  }
+
   onSave() {
     this.save.next(null);
   }
 
   onLoad() {
     this.load.next(this.inputProjectKey);
+  }
+
+  onProjectNameChanged(name: string) {
+    this.projectNameChanged.next(name);
+  }
+
+  undo() {
+    this.undoEmit.next();
+  }
+
+  redo() {
+    this.redoEmit.next();
   }
 }
