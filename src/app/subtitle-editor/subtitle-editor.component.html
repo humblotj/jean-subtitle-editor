@@ -28,7 +28,7 @@
         (lineClick)="lineClick($event)" (contextmenu)="onContextMenu($event, i)">
       </app-script-line>
     </cdk-virtual-scroll-viewport>
-    <cdk-virtual-scroll-viewport *ngIf="chunkMode" [itemSize]="21" class="scroll-viewport"
+    <cdk-virtual-scroll-viewport *ngIf="chunkMode" [itemSize]="38" class="scroll-viewport"
       style="height: calc(100% - 120px);">
       <app-script-line-chunk *cdkVirtualFor="let time of timeStamp; let i = index;" [index]="i" [sentence]="script[i]"
         [script]="script">

@@ -51,8 +51,14 @@ export class SubtitleEditorComponent implements OnInit {
   @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
   contextMenuPosition = { x: '0px', y: '0px' };
 
-  dataUndoArray: Array<{ timeStamp: { startMs: number, endMs: number }[], script: string[], scriptTranslation: string[] }> = [];
-  dataRedoArray: Array<{ timeStamp: { startMs: number, endMs: number }[], script: string[], scriptTranslation: string[] }> = [];
+  dataUndoArray: Array<{
+    timeStamp: { startMs: number, endMs: number }[], script: string[],
+    scriptTranslation: string[], preview: { en: string, ko: string, rpa: string }[];
+  }> = [];
+  dataRedoArray: Array<{
+    timeStamp: { startMs: number, endMs: number }[], script: string[],
+    scriptTranslation: string[], preview: { en: string, ko: string, rpa: string }[];
+  }> = [];
   undoLimit = 5;
   showUndo = false;
   showRedo = false;
@@ -551,8 +557,12 @@ export class SubtitleEditorComponent implements OnInit {
     this.timeStamp.splice(index, 1);
     this.script.splice(index, 1);
     this.scriptTranslation.splice(index, 1);
+    this.preview.splice(index, 1);
 
     this.timeStamp = this.timeStamp.slice();
+    // const indexActiveTmp = this.indexActive;
+    // this.indexActive = 0;
+    // setTimeout(() => this.indexActive = indexActiveTmp, 0);
   }
 
   insertNext(index: number) {
@@ -566,6 +576,7 @@ export class SubtitleEditorComponent implements OnInit {
     this.timeStamp.splice(index + 1, 0, { startMs: start, endMs: end });
     this.script.splice(index + 1, 0, '');
     this.scriptTranslation.splice(index + 1, 0, '');
+    this.preview.splice(index + 1, 0, { en: '', ko: '', rpa: '' });
 
     this.timeStamp = this.timeStamp.slice();
   }
@@ -580,6 +591,7 @@ export class SubtitleEditorComponent implements OnInit {
     this.timeStamp.splice(index + 1, 0, { startMs: start, endMs: end });
     this.script.splice(index + 1, 0, this.script[index]);
     this.scriptTranslation.splice(index + 1, 0, this.scriptTranslation[index]);
+    this.preview.splice(index + 1, 0, this.preview[index]);
 
     this.timeStamp = this.timeStamp.slice();
   }
@@ -597,14 +609,22 @@ export class SubtitleEditorComponent implements OnInit {
     this.scriptTranslation[index] =
       (this.scriptTranslation[index].trim() + ' ' + this.scriptTranslation[index + 1]).trim();
     this.scriptTranslation.splice(index + 1, 1);
+    this.preview[index] = {
+      en: this.preview[index].en.trim() + ' ' + this.preview[index + 1].en,
+      ko: this.preview[index].ko.trim() + ' ' + this.preview[index + 1].ko,
+      rpa: this.preview[index].rpa.trim() + ' ' + this.preview[index + 1].rpa
+    };
+    this.preview.splice(index + 1, 1);
 
     this.timeStamp = this.timeStamp.slice();
   }
 
   deleteLeft(index: number) {
     this.do();
-    this.script.splice(index, 1);
     this.script[this.script.length] = '';
+    this.script.splice(index, 1);
+    this.preview[this.script.length] = { en: '', ko: '', rpa: '' };
+    this.preview.splice(index, 1);
   }
 
   deleteRight(index: number) {
@@ -721,7 +741,10 @@ export class SubtitleEditorComponent implements OnInit {
       this.dataUndoArray.reverse();
     }
     this.dataUndoArray.push(
-      { timeStamp: this.timeStamp.slice(), script: this.script.slice(), scriptTranslation: this.scriptTranslation.slice() });
+      {
+        timeStamp: this.timeStamp.slice(), script: this.script.slice(),
+        scriptTranslation: this.scriptTranslation.slice(), preview: this.preview.slice()
+      });
     this.showUndo = true;
   }
 
@@ -729,11 +752,15 @@ export class SubtitleEditorComponent implements OnInit {
     this.showRedo = true;
     if (this.dataUndoArray.length !== 0) {
       this.dataRedoArray.push(
-        { timeStamp: this.timeStamp.slice(), script: this.script.slice(), scriptTranslation: this.scriptTranslation.slice() });
+        {
+          timeStamp: this.timeStamp.slice(), script: this.script.slice(),
+          scriptTranslation: this.scriptTranslation.slice(), preview: this.preview.slice()
+        });
       const currentData = this.dataUndoArray.pop();
       this.timeStamp = currentData.timeStamp;
       this.script = currentData.script;
       this.scriptTranslation = currentData.scriptTranslation;
+      this.preview = currentData.preview;
 
       if (this.dataUndoArray.length === 0) {
         this.showUndo = false;
@@ -747,11 +774,15 @@ export class SubtitleEditorComponent implements OnInit {
   redo() {
     if (this.dataRedoArray.length !== 0) {
       this.dataUndoArray.push(
-        { timeStamp: this.timeStamp.slice(), script: this.script.slice(), scriptTranslation: this.scriptTranslation.slice() });
+        {
+          timeStamp: this.timeStamp.slice(), script: this.script.slice(),
+          scriptTranslation: this.scriptTranslation.slice(), preview: this.preview.slice()
+        });
       const currentData = this.dataRedoArray.pop();
       this.timeStamp = currentData.timeStamp.slice();
       this.script = currentData.script;
       this.scriptTranslation = currentData.scriptTranslation;
+      this.preview = currentData.preview;
 
       if (this.dataRedoArray.length === 0) {
         this.showRedo = false;

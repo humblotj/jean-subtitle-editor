@@ -1,11 +1,10 @@
-<div fxLayout="row" style="margin: 16px 12px;">
-  <span style="font-size: small; margin: auto 10px;">{{index+1}}</span>
-  <span *ngIf="chunkTexts.length!==0">{{chunkTexts[0]}}</span>
+<div fxLayout="row" style="margin: 8px 12px;">
+  <span style="font-size: small; margin: auto 10px; line-height: 24px;">{{index+1}}</span>
+  <span *ngIf="chunkTexts.length!==0" style="margin: auto 0; line-height: 38px;">{{chunkTexts[0]}}</span>
   <ng-container *ngFor="let chunk of chunks; let i = index">
-    <span style="width: 20px; text-align: center; color: red; cursor: pointer;"
+    <span style="width: 20px; text-align: center; color: red; cursor: pointer; font-size: xx-large;"
       (click)="toggleChunk(i)">{{chunk ? '|' : ''}}</span>
-    <span>{{chunkTexts[i+1]}}</span>
+    <span style="margin: auto 0; line-height: 38px;">{{chunkTexts[i+1]}}</span>
   </ng-container>
 </div>
 <hr class="underline">
-
