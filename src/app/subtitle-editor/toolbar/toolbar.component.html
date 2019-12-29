@@ -3,7 +3,7 @@
     <mat-tab label="Home">
       <div fxLayoutAlign="space-between">
         <div fxLayoutAlign="start stretch">
-          <button mat-button (click)="onLoad()" [disabled]="!inputProjectKey">
+          <button mat-button (click)="onLoad()" [disabled]="!inputProjectKey||loading">
             <div fxLayout="column" fxLayoutAlign="center center">
               <mat-icon svgIcon="file-download" style="margin-top: 8px;"></mat-icon>
               <span style="font-size: smaller;margin-top: -10px;">Load Project</span>
@@ -34,29 +34,7 @@
           </button>
           <mat-divider [vertical]="true"></mat-divider>
         </div>
-        <div fxLayoutAlign="start stretch">
-          <mat-divider [vertical]="true"></mat-divider>
-          <button mat-button (click)="onSave()" [disabled]="hasScript">
-            <div fxLayout="column" fxLayoutAlign="center center">
-              <mat-icon svgIcon="content-save" style="margin-top: 8px;"></mat-icon>
-              <span style="font-size: smaller;margin-top: -10px;">Save Project</span>
-            </div>
-          </button>
-          <mat-divider [vertical]="true"></mat-divider>
-          <button mat-button (click)="undo()" [disabled]="!showUndo">
-            <div fxLayout="column" fxLayoutAlign="center center">
-              <mat-icon svgIcon="undo" style="margin-top: 8px;"></mat-icon>
-              <span style="font-size: smaller;margin-top: -10px;">Undo</span>
-            </div>
-          </button>
-          <mat-divider [vertical]="true"></mat-divider>
-          <button mat-button (click)="redo()" [disabled]="!showRedo">
-            <div fxLayout="column" fxLayoutAlign="center center">
-              <mat-icon svgIcon="redo" style="margin-top: 8px;"></mat-icon>
-              <span style="font-size: smaller;margin-top: -10px;">Redo</span>
-            </div>
-          </button>
-        </div>
+        <ng-template [ngTemplateOutlet]="commonButtons"></ng-template>
       </div>
     </mat-tab>
     <mat-tab label="Video">
@@ -89,36 +67,14 @@
           </button>
           <mat-divider [vertical]="true"></mat-divider>
         </div>
-        <div fxLayoutAlign="start stretch">
-          <mat-divider [vertical]="true"></mat-divider>
-          <button mat-button (click)="onSave()" [disabled]="hasScript">
-            <div fxLayout="column" fxLayoutAlign="center center">
-              <mat-icon svgIcon="content-save" style="margin-top: 8px;"></mat-icon>
-              <span style="font-size: smaller;margin-top: -10px;">Save Project</span>
-            </div>
-          </button>
-          <mat-divider [vertical]="true"></mat-divider>
-          <button mat-button (click)="undo()" [disabled]="!showUndo">
-            <div fxLayout="column" fxLayoutAlign="center center">
-              <mat-icon svgIcon="undo" style="margin-top: 8px;"></mat-icon>
-              <span style="font-size: smaller;margin-top: -10px;">Undo</span>
-            </div>
-          </button>
-          <mat-divider [vertical]="true"></mat-divider>
-          <button mat-button (click)="redo()" [disabled]="!showRedo">
-            <div fxLayout="column" fxLayoutAlign="center center">
-              <mat-icon svgIcon="redo" style="margin-top: 8px;"></mat-icon>
-              <span style="font-size: smaller;margin-top: -10px;">Redo</span>
-            </div>
-          </button>
-        </div>
+        <ng-template [ngTemplateOutlet]="commonButtons"></ng-template>
       </div>
     </mat-tab>
     <mat-tab label="Subtitle">
       <div fxLayoutAlign="space-between">
         <div fxLayoutAlign="start stretch">
           <div>
-            <button mat-button [matMenuTriggerFor]="menu">
+            <button mat-button [matMenuTriggerFor]="menu" [disabled]="loading">
               <div fxLayout="column" fxLayoutAlign="center center">
                 <mat-icon svgIcon="subtitles-outline" style="margin-top: 8px;"></mat-icon>
                 <span style="font-size: smaller;margin-top: -10px;">Select Subtitle</span>
@@ -140,7 +96,7 @@
                 {{subtitle.lang_translated}}
               </button>
             </mat-menu>
-            <button mat-button [matMenuTriggerFor]="menuTranslation">
+            <button mat-button [matMenuTriggerFor]="menuTranslation" [disabled]="loading">
               <div fxLayout="column" fxLayoutAlign="center center">
                 <mat-icon svgIcon="subtitles" style="margin-top: 8px;"></mat-icon>
                 <span style="font-size: smaller;margin-top: -10px;">Select Translation</span>
@@ -161,7 +117,7 @@
           </div>
           <mat-divider [vertical]="true"></mat-divider>
           <div fxLayoutAlign="center center" style="margin-right: 12px;">
-            <button mat-button (click)="onTranslate()" [disabled]="hasScript">
+            <button mat-button (click)="onTranslate()" [disabled]="hasScript||loading">
               <div fxLayout="column" fxLayoutAlign="center center">
                 <mat-icon svgIcon="translate" style="margin-top: 8px;"></mat-icon>
                 <span style="font-size: smaller;margin-top: -10px;">Translate</span>
@@ -212,29 +168,7 @@
           </mat-menu>
           <mat-divider [vertical]="true"></mat-divider>
         </div>
-        <div fxLayoutAlign="start stretch">
-          <mat-divider [vertical]="true"></mat-divider>
-          <button mat-button (click)="onSave()" [disabled]="hasScript">
-            <div fxLayout="column" fxLayoutAlign="center center">
-              <mat-icon svgIcon="content-save" style="margin-top: 8px;"></mat-icon>
-              <span style="font-size: smaller;margin-top: -10px;">Save Project</span>
-            </div>
-          </button>
-          <mat-divider [vertical]="true"></mat-divider>
-          <button mat-button (click)="undo()" [disabled]="!showUndo">
-            <div fxLayout="column" fxLayoutAlign="center center">
-              <mat-icon svgIcon="undo" style="margin-top: 8px;"></mat-icon>
-              <span style="font-size: smaller;margin-top: -10px;">Undo</span>
-            </div>
-          </button>
-          <mat-divider [vertical]="true"></mat-divider>
-          <button mat-button (click)="redo()" [disabled]="!showRedo">
-            <div fxLayout="column" fxLayoutAlign="center center">
-              <mat-icon svgIcon="redo" style="margin-top: 8px;"></mat-icon>
-              <span style="font-size: smaller;margin-top: -10px;">Redo</span>
-            </div>
-          </button>
-        </div>
+        <ng-template [ngTemplateOutlet]="commonButtons"></ng-template>
       </div>
     </mat-tab>
     <mat-tab label="Edit">
@@ -248,7 +182,7 @@
             </div>
           </button>
           <mat-divider [vertical]="true"></mat-divider>
-          <button mat-button (click)="onAutoChunk()" [disabled]="hasScript||chunkMode">
+          <button mat-button (click)="onAutoChunk()" [disabled]="hasScript||chunkMode||loading">
             <div fxLayout="column" fxLayoutAlign="center center">
               <mat-icon svgIcon="atom-variant" style="margin-top: 8px;"></mat-icon>
               <span style="font-size: smaller;margin-top: -10px;">Auto Chunk</span>
@@ -256,30 +190,35 @@
           </button>
           <mat-divider [vertical]="true"></mat-divider>
         </div>
-        <div fxLayoutAlign="start stretch">
-          <mat-divider [vertical]="true"></mat-divider>
-          <button mat-button (click)="onSave()" [disabled]="hasScript">
-            <div fxLayout="column" fxLayoutAlign="center center">
-              <mat-icon svgIcon="content-save" style="margin-top: 8px;"></mat-icon>
-              <span style="font-size: smaller;margin-top: -10px;">Save Project</span>
-            </div>
-          </button>
-          <mat-divider [vertical]="true"></mat-divider>
-          <button mat-button (click)="undo()" [disabled]="!showUndo">
-            <div fxLayout="column" fxLayoutAlign="center center">
-              <mat-icon svgIcon="undo" style="margin-top: 8px;"></mat-icon>
-              <span style="font-size: smaller;margin-top: -10px;">Undo</span>
-            </div>
-          </button>
-          <mat-divider [vertical]="true"></mat-divider>
-          <button mat-button (click)="redo()" [disabled]="!showRedo">
-            <div fxLayout="column" fxLayoutAlign="center center">
-              <mat-icon svgIcon="redo" style="margin-top: 8px;"></mat-icon>
-              <span style="font-size: smaller;margin-top: -10px;">Redo</span>
-            </div>
-          </button>
-        </div>
+        <ng-template [ngTemplateOutlet]="commonButtons"></ng-template>
       </div>
     </mat-tab>
   </mat-tab-group>
 </mat-toolbar>
+
+<ng-template #commonButtons>
+  <div fxLayoutAlign="start stretch">
+    <mat-spinner *ngIf="loading" [diameter]="30" style="margin: auto 12px;"></mat-spinner>
+    <mat-divider [vertical]="true"></mat-divider>
+    <button mat-button (click)="onSave()" [disabled]="hasScript">
+      <div fxLayout="column" fxLayoutAlign="center center">
+        <mat-icon svgIcon="content-save" style="margin-top: 8px;"></mat-icon>
+        <span style="font-size: smaller;margin-top: -10px;">Save Project</span>
+      </div>
+    </button>
+    <mat-divider [vertical]="true"></mat-divider>
+    <button mat-button (click)="undo()" [disabled]="!showUndo||loading">
+      <div fxLayout="column" fxLayoutAlign="center center">
+        <mat-icon svgIcon="undo" style="margin-top: 8px;"></mat-icon>
+        <span style="font-size: smaller;margin-top: -10px;">Undo</span>
+      </div>
+    </button>
+    <mat-divider [vertical]="true"></mat-divider>
+    <button mat-button (click)="redo()" [disabled]="!showRedo||loading">
+      <div fxLayout="column" fxLayoutAlign="center center">
+        <mat-icon svgIcon="redo" style="margin-top: 8px;"></mat-icon>
+        <span style="font-size: smaller;margin-top: -10px;">Redo</span>
+      </div>
+    </button>
+  </div>
+</ng-template>

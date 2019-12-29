@@ -44,32 +44,37 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
     if (changes.url && this.url !== '') {
       this.initPlayer();
     }
-    if (changes.indexActive && this.indexActive !== null) {
-      if (this.preview != null) {
-        this.topText = this.preview[this.indexActive].en;
-        this.bottomText = this.preview[this.indexActive].ko;
-      }
-      if (changes.indexActive.previousValue !== null) {
-        const previousIndex = changes.indexActive.previousValue;
-        if (typeof this.preview !== 'undefined'
-          && this.preview[previousIndex].en.replace(/\{(.*?)\}/gi, '') !== this.script[previousIndex]) {
-          const subtitleBuild = this.subtitleParserService.build([{
-            id: previousIndex,
-            start: 0,
-            end: 0,
-            text: this.script[previousIndex],
-          }], 'srt');
-          this.mglishService.getMglishSubtitles(subtitleBuild).subscribe(
-            (result: any) => {
-              this.preview[previousIndex].en = result[0].en;
-              this.preview[previousIndex].ko = result[0].ko;
-              this.topText = this.preview[this.indexActive].en;
-              this.bottomText = this.preview[this.indexActive].ko;
-            });
+    if (changes.indexActive) {
+      if (this.indexActive !== null) {
+        if (this.preview != null) {
+          this.topText = this.preview[this.indexActive].en;
+          this.bottomText = this.preview[this.indexActive].ko;
         }
+        if (changes.indexActive.previousValue !== null) {
+          const previousIndex = changes.indexActive.previousValue;
+          if (typeof this.preview !== 'undefined'
+            && this.preview[previousIndex].en.replace(/\{(.*?)\}/gi, '') !== this.script[previousIndex]) {
+            const subtitleBuild = this.subtitleParserService.build([{
+              id: previousIndex,
+              start: 0,
+              end: 0,
+              text: this.script[previousIndex],
+            }], 'srt');
+            this.mglishService.getMglishSubtitles(subtitleBuild).subscribe(
+              (result: any) => {
+                this.preview[previousIndex].en = result[0].en;
+                this.preview[previousIndex].ko = result[0].ko;
+                this.topText = this.preview[this.indexActive].en;
+                this.bottomText = this.preview[this.indexActive].ko;
+              });
+          }
+        }
+      } else {
+        this.topText = '';
+        this.bottomText = '';
       }
     }
-    if (changes.preview) {
+    if (changes.preview && this.indexActive !== null) {
       if (this.preview != null) {
         this.topText = this.preview[this.indexActive].en;
         this.bottomText = this.preview[this.indexActive].ko;

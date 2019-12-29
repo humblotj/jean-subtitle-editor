@@ -32,6 +32,7 @@ export class ToolbarComponent implements OnInit, OnChanges {
   @Input() videoId: string;
   @Input() showUndo: boolean;
   @Input() showRedo: boolean;
+  @Input() loading: boolean;
 
 
   inputProjectKey = '';

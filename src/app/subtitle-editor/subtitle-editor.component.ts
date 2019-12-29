@@ -32,6 +32,9 @@ export class SubtitleEditorComponent implements OnInit {
   videoId = '';
   subtitleList: string[] = [];
 
+  loading = false;
+  errorMessage = '';
+
   private repeatTimeout = null;
   private regions = [];
   private adjacentTimeTmp: any = {}; // save adjacent timestamp for resizing purpose
@@ -47,6 +50,10 @@ export class SubtitleEditorComponent implements OnInit {
   preview: { en: string, ko: string, rpa: string }[];
   indexActive: number = null;
   previousIndexActive: number = null;
+  previousState: {
+    timeStamp: { startMs: number, endMs: number },
+    script: string, scriptTranslation: string, preview: { en: string, ko: string, rpa: string }
+  } = null;
 
   @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
   contextMenuPosition = { x: '0px', y: '0px' };
@@ -153,7 +160,13 @@ export class SubtitleEditorComponent implements OnInit {
   }
 
   subtitleSelected(data: any) {
+    this.loading = true;
+    this.errorMessage = '';
+
     this.projectKey = '';
+
+    this.do();
+
     this.previousIndexActive = null;
     this.indexActive = null;
     this.timeStamp = data.map((line: any) => ({ startMs: line.startTime, endMs: line.endTime }));
@@ -162,8 +175,10 @@ export class SubtitleEditorComponent implements OnInit {
       script[i] = '';
     }
     const scriptTranslation: string[] = [];
+    this.preview = [];
     for (let i = 0; i < this.timeStamp.length; i++) {
       scriptTranslation[i] = '';
+      this.preview[i] = { en: '', ko: '', rpa: '' };
     }
     const dataJSON = this.timeStamp.map((line, index: number) => {
       return {
@@ -182,9 +197,16 @@ export class SubtitleEditorComponent implements OnInit {
     if (this.wavesurfer) {
       this.loadRegions();
     }
+
+    this.loading = false;
   }
 
   translationSelected(data: any) {
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.do();
+
     const timeStamp = data.map((line: any) => ({ startMs: line.startTime, endMs: line.endTime }));
     const scriptTranslation: string[] = this.getFullText(data).split('\r\n');
     if (timeStamp.length < this.timeStamp.length) {
@@ -197,12 +219,15 @@ export class SubtitleEditorComponent implements OnInit {
       for (let i = this.timeStamp.length; i < timeStamp.length; i++) {
         timeStampTmp[i] = timeStamp[i];
         script[i] = '';
+        this.preview[i] = { en: '', ko: '', rpa: '' };
       }
       this.timeStamp = timeStampTmp;
       this.script = script;
     }
     this.scriptTranslation = scriptTranslation;
     this.loadRegions();
+
+    this.loading = false;
   }
 
   getFullText(srt: any) {
@@ -213,6 +238,9 @@ export class SubtitleEditorComponent implements OnInit {
     if (this.script.length === 0) {
       this.toolsService.openSnackBar('Select Subtitle First', 2000);
     } else {
+      this.loading = true;
+      this.errorMessage = '';
+
       this.do();
       let scriptTranslation: string[] = [];
       for (let i = 0; i < this.timeStamp.length; i++) {
@@ -227,9 +255,13 @@ export class SubtitleEditorComponent implements OnInit {
           scriptTranslation[i] = '';
         }
         this.scriptTranslation = scriptTranslation;
+
+        this.loading = false;
       },
         err => {
           console.error(err);
+          this.loading = false;
+          this.errorMessage = err;
         });
     }
   }
@@ -323,6 +355,24 @@ export class SubtitleEditorComponent implements OnInit {
   }
 
   setIndexActive(index: number) {
+    if (this.previousState !== null && this.indexActive !== null) {
+      const iTmp = this.indexActive;
+      if (this.previousState.script === this.script[iTmp] &&
+        this.previousState.scriptTranslation === this.scriptTranslation[iTmp] &&
+        this.previousState.timeStamp.startMs === this.timeStamp[iTmp].startMs &&
+        this.previousState.timeStamp.endMs === this.timeStamp[iTmp].endMs
+      ) {
+        console.log('ok');
+      } else {
+        this.doBis(iTmp);
+        console.log('do');
+      }
+    }
+
+    this.previousState = {
+      timeStamp: JSON.parse(JSON.stringify(this.timeStamp[index])), script: this.script[index],
+      scriptTranslation: this.scriptTranslation[index], preview: JSON.parse(JSON.stringify(this.preview[index]))
+    };
     this.previousIndexActive = this.indexActive;
     if (this.wavesurfer) {
       if (this.previousIndexActive !== null && this.previousIndexActive !== index &&
@@ -410,82 +460,86 @@ export class SubtitleEditorComponent implements OnInit {
   }
 
   loadRegions() {
-    this.wavesurfer.clearRegions();
-    for (let i = 0; i < this.timeStamp.length; i++) {
-      if (i !== this.indexActive) {
-        this.addRegion(i, false, i % 2 === 0 ? 'rgba(0,0,128,.1)' : 'hsla(100, 100%, 30%, 0.1)');
+    if (this.wavesurfer) {
+      this.wavesurfer.clearRegions();
+      for (let i = 0; i < this.timeStamp.length; i++) {
+        if (i !== this.indexActive) {
+          this.addRegion(i, false, i % 2 === 0 ? 'rgba(0,0,128,.1)' : 'hsla(100, 100%, 30%, 0.1)');
+        }
       }
+      this.addRegionActive(this.indexActive);
     }
-    this.addRegionActive(this.indexActive);
   }
 
   addRegion(id: number, resize: boolean, color: string) {
-    const duration = this.wavesurfer.getDuration();
-    if (this.timeStamp[id].endMs / 1000 < duration) {
-      switch (this.labelSelected) {
-        case 'none':
-          this.wavesurfer.addRegion({
-            id,
-            start: this.timeStamp[id].startMs / 1000,
-            end: this.timeStamp[id].endMs / 1000,
-            drag: false,
-            resize,
-            color,
-            attributes: {
-              id: id + 1
+    if (id !== null) {
+      const duration = this.wavesurfer.getDuration();
+      if (this.timeStamp[id].endMs / 1000 < duration) {
+        switch (this.labelSelected) {
+          case 'none':
+            this.wavesurfer.addRegion({
+              id,
+              start: this.timeStamp[id].startMs / 1000,
+              end: this.timeStamp[id].endMs / 1000,
+              drag: false,
+              resize,
+              color,
+              attributes: {
+                id: id + 1
+              }
+            });
+            break;
+          case 'original text':
+            this.wavesurfer.addRegion({
+              id,
+              start: this.timeStamp[id].startMs / 1000,
+              end: this.timeStamp[id].endMs / 1000,
+              drag: false,
+              resize,
+              color,
+              attributes: {
+                id: (id + 1),
+                top: this.script[id].replace(/\{(.*?)\}|\|/gi, ''),
+              }
+            });
+            break;
+          case 'translation':
+            this.wavesurfer.addRegion({
+              id,
+              start: this.timeStamp[id].startMs / 1000,
+              end: this.timeStamp[id].endMs / 1000,
+              drag: false,
+              resize,
+              color,
+              attributes: {
+                id: (id + 1),
+                top: this.scriptTranslation[id].replace(/\{(.*?)\}|\|/gi, '')
+              }
+            });
+            break;
+          case 'both':
+            this.wavesurfer.addRegion({
+              id,
+              start: this.timeStamp[id].startMs / 1000,
+              end: this.timeStamp[id].endMs / 1000,
+              drag: false,
+              resize,
+              color,
+              attributes: {
+                id: (id + 1),
+                top: this.script[id].replace(/\{(.*?)\}|\|/gi, ''),
+                bottom: this.scriptTranslation[id].replace(/\{(.*?)\}|\|/gi, '')
+              }
+            });
+            break;
+        }
+        if (typeof this.timeStamp[id - 1] !== 'undefined') {
+          if (this.timeStamp[id - 1].startMs === this.timeStamp[id].startMs) {
+            this.wavesurfer.regions.list[id].element.className += ' overlapped';
+          } else {
+            if (this.wavesurfer.regions.list[id].element.classList.contains('overlapped')) {
+              this.wavesurfer.regions.list[id].element.classList.remove('overlapped');
             }
-          });
-          break;
-        case 'original text':
-          this.wavesurfer.addRegion({
-            id,
-            start: this.timeStamp[id].startMs / 1000,
-            end: this.timeStamp[id].endMs / 1000,
-            drag: false,
-            resize,
-            color,
-            attributes: {
-              id: (id + 1),
-              top: this.script[id].replace(/\{(.*?)\}|\|/gi, ''),
-            }
-          });
-          break;
-        case 'translation':
-          this.wavesurfer.addRegion({
-            id,
-            start: this.timeStamp[id].startMs / 1000,
-            end: this.timeStamp[id].endMs / 1000,
-            drag: false,
-            resize,
-            color,
-            attributes: {
-              id: (id + 1),
-              top: this.scriptTranslation[id].replace(/\{(.*?)\}|\|/gi, '')
-            }
-          });
-          break;
-        case 'both':
-          this.wavesurfer.addRegion({
-            id,
-            start: this.timeStamp[id].startMs / 1000,
-            end: this.timeStamp[id].endMs / 1000,
-            drag: false,
-            resize,
-            color,
-            attributes: {
-              id: (id + 1),
-              top: this.script[id].replace(/\{(.*?)\}|\|/gi, ''),
-              bottom: this.scriptTranslation[id].replace(/\{(.*?)\}|\|/gi, '')
-            }
-          });
-          break;
-      }
-      if (typeof this.timeStamp[id - 1] !== 'undefined') {
-        if (this.timeStamp[id - 1].startMs === this.timeStamp[id].startMs) {
-          this.wavesurfer.regions.list[id].element.className += ' overlapped';
-        } else {
-          if (this.wavesurfer.regions.list[id].element.classList.contains('overlapped')) {
-            this.wavesurfer.regions.list[id].element.classList.remove('overlapped');
           }
         }
       }
@@ -493,33 +547,35 @@ export class SubtitleEditorComponent implements OnInit {
   }
 
   addRegionActive(id: number) {
-    this.addRegion(id, true, 'hsla(360, 100%, 50%, 0.3)');
-    this.wavesurfer.regions.list[id].element.style.zIndex = 3;
+    if (id !== null) {
+      this.addRegion(id, true, 'hsla(360, 100%, 50%, 0.3)');
+      this.wavesurfer.regions.list[id].element.style.zIndex = 3;
 
-    const that = this;
-    this.wavesurfer.regions.list[id].onResize = function (delta, direction) {
-      // re-implement existing functionality so interface updates work
-      if (direction === 'start') {
-        this.update({
-          start: Math.min(this.start + delta, this.end),
-          end: Math.max(this.start + delta, this.end)
-        });
-      } else {
-        this.update({
-          start: Math.min(this.end + delta, this.start),
-          end: Math.max(this.end + delta, this.start)
-        });
+      const that = this;
+      this.wavesurfer.regions.list[id].onResize = function (delta, direction) {
+        // re-implement existing functionality so interface updates work
+        if (direction === 'start') {
+          this.update({
+            start: Math.min(this.start + delta, this.end),
+            end: Math.max(this.start + delta, this.end)
+          });
+        } else {
+          this.update({
+            start: Math.min(this.end + delta, this.start),
+            end: Math.max(this.end + delta, this.start)
+          });
+        }
+        // resize the region adjacent to this one
+        that.resizeAdjacent(this, direction);
+      };
+      this.regions = [];
+      if (id !== 0) {
+        this.regions.push(this.wavesurfer.regions.list[id - 1]);
       }
-      // resize the region adjacent to this one
-      that.resizeAdjacent(this, direction);
-    };
-    this.regions = [];
-    if (id !== 0) {
-      this.regions.push(this.wavesurfer.regions.list[id - 1]);
-    }
-    this.regions.push(this.wavesurfer.regions.list[id]);
-    if (id !== this.timeStamp.length - 1) {
-      this.regions.push(this.wavesurfer.regions.list[id + 1]);
+      this.regions.push(this.wavesurfer.regions.list[id]);
+      if (id !== this.timeStamp.length - 1) {
+        this.regions.push(this.wavesurfer.regions.list[id + 1]);
+      }
     }
   }
 
@@ -558,11 +614,11 @@ export class SubtitleEditorComponent implements OnInit {
     this.script.splice(index, 1);
     this.scriptTranslation.splice(index, 1);
     this.preview.splice(index, 1);
+    this.regions.splice(index, 1);
 
     this.timeStamp = this.timeStamp.slice();
-    // const indexActiveTmp = this.indexActive;
-    // this.indexActive = 0;
-    // setTimeout(() => this.indexActive = indexActiveTmp, 0);
+
+    this.loadRegions();
   }
 
   insertNext(index: number) {
@@ -579,6 +635,8 @@ export class SubtitleEditorComponent implements OnInit {
     this.preview.splice(index + 1, 0, { en: '', ko: '', rpa: '' });
 
     this.timeStamp = this.timeStamp.slice();
+
+    this.loadRegions();
   }
 
 
@@ -594,6 +652,8 @@ export class SubtitleEditorComponent implements OnInit {
     this.preview.splice(index + 1, 0, this.preview[index]);
 
     this.timeStamp = this.timeStamp.slice();
+
+    this.loadRegions();
   }
 
   merge(index: number) {
@@ -617,6 +677,9 @@ export class SubtitleEditorComponent implements OnInit {
     this.preview.splice(index + 1, 1);
 
     this.timeStamp = this.timeStamp.slice();
+
+    this.loadRegions();
+    this.updateIndexActive();
   }
 
   deleteLeft(index: number) {
@@ -625,12 +688,17 @@ export class SubtitleEditorComponent implements OnInit {
     this.script.splice(index, 1);
     this.preview[this.script.length] = { en: '', ko: '', rpa: '' };
     this.preview.splice(index, 1);
+
+    this.loadRegions();
+    this.updateIndexActive();
   }
 
   deleteRight(index: number) {
     this.do();
     this.scriptTranslation.splice(index, 1);
     this.scriptTranslation[this.script.length] = '';
+
+    this.loadRegions();
   }
 
   chunkModeChanged(chunkMode: boolean) {
@@ -691,13 +759,22 @@ export class SubtitleEditorComponent implements OnInit {
       if (data === null) {
         this.toolsService.openSnackBar('Wrong Project Key', 2000);
       } else {
+        this.loading = true;
+        this.errorMessage = '';
+
         this.indexActive = 0;
         this.projectKey = id;
         this.projectName = data.projectName;
         this.timeStamp = data.timeStamp;
         this.script = data.script;
         this.scriptTranslation = data.scriptTranslation;
+        this.preview = [];
+        for (let i = 0; i < this.timeStamp.length; i++) {
+          this.preview[i] = { en: '', ko: '', rpa: '' };
+        }
+
         this.yTLinkPlayed(data.videoId);
+
         const dataJSON = this.timeStamp.map((line, index: number) => {
           return {
             id: index,
@@ -709,6 +786,8 @@ export class SubtitleEditorComponent implements OnInit {
         const dataFile = this.subtitleParserService.build(dataJSON, 'srt');
         this.mglishService.getMglishSubtitles(dataFile).subscribe(
           (result: any) => { this.preview = result; });
+
+        this.loading = false;
       }
     });
   }
@@ -718,6 +797,8 @@ export class SubtitleEditorComponent implements OnInit {
   }
 
   onAutoChunk() {
+    this.loading = true;
+    this.errorMessage = '';
     this.mglishNLService.chunkTextArray(this.script).subscribe(
       (result: string[]) => {
         this.do();
@@ -726,9 +807,25 @@ export class SubtitleEditorComponent implements OnInit {
         for (let i = this.script.length; i < oldLength; i++) {
           this.script[i] = '';
         }
+
+        const dataJSON = this.timeStamp.map((line, index: number) => {
+          return {
+            id: index,
+            start: line.startMs,
+            end: line.endMs,
+            text: this.script[index].replace(/\{(.*?)\}/gi, '').trim()
+          };
+        });
+        const dataFile = this.subtitleParserService.build(dataJSON, 'srt');
+        this.mglishService.getMglishSubtitles(dataFile).subscribe(
+          (resultPreview: any) => { this.preview = resultPreview; });
+
+        this.loading = false;
       },
       error => {
         console.error(error);
+        this.loading = true;
+        this.errorMessage = error;
       });
   }
 
@@ -742,9 +839,36 @@ export class SubtitleEditorComponent implements OnInit {
     }
     this.dataUndoArray.push(
       {
-        timeStamp: this.timeStamp.slice(), script: this.script.slice(),
-        scriptTranslation: this.scriptTranslation.slice(), preview: this.preview.slice()
+        timeStamp: JSON.parse(JSON.stringify(this.timeStamp)), script: this.script.slice(),
+        scriptTranslation: this.scriptTranslation.slice(), preview: this.preview ? JSON.parse(JSON.stringify(this.preview)) : []
       });
+    this.showUndo = true;
+  }
+
+  doBis(index: number): void {
+    this.dataRedoArray = [];
+    this.showRedo = false;
+
+    if (this.dataUndoArray.length === this.undoLimit) {
+      this.dataUndoArray.reverse().pop();
+      this.dataUndoArray.reverse();
+    }
+    const timeStamp = JSON.parse(JSON.stringify(this.timeStamp));
+    timeStamp[index].startMs = this.previousState.timeStamp.startMs;
+    timeStamp[index].endMs = this.previousState.timeStamp.endMs;
+    const script = this.script.slice();
+    script[index] = this.previousState.script;
+    const scriptTranslation = this.scriptTranslation.slice();
+    scriptTranslation[index] = this.previousState.scriptTranslation;
+    const preview = this.preview ? JSON.parse(JSON.stringify(this.preview)) : [];
+    if (preview.length !== 0) {
+      preview[index].en = this.previousState.preview.en;
+      preview[index].ko = this.previousState.preview.ko;
+      preview[index].rpa = this.previousState.preview.rpa;
+    }
+
+    this.dataUndoArray.push(
+      { timeStamp, script, scriptTranslation, preview: this.preview ? JSON.parse(JSON.stringify(this.preview)) : [] });
     this.showUndo = true;
   }
 
@@ -753,8 +877,9 @@ export class SubtitleEditorComponent implements OnInit {
     if (this.dataUndoArray.length !== 0) {
       this.dataRedoArray.push(
         {
-          timeStamp: this.timeStamp.slice(), script: this.script.slice(),
-          scriptTranslation: this.scriptTranslation.slice(), preview: this.preview.slice()
+          timeStamp: JSON.parse(JSON.stringify(this.timeStamp)), script: this.script.slice(),
+          scriptTranslation: this.scriptTranslation.slice(),
+          preview: this.preview ? JSON.parse(JSON.stringify(this.preview)) : []
         });
       const currentData = this.dataUndoArray.pop();
       this.timeStamp = currentData.timeStamp;
@@ -766,8 +891,9 @@ export class SubtitleEditorComponent implements OnInit {
         this.showUndo = false;
       }
       if (this.indexActive > this.timeStamp.length - 1) {
-        this.indexActive = this.timeStamp.length - 1;
+        this.indexActive = this.timeStamp.length ? this.timeStamp.length - 1 : null;
       }
+      this.loadRegions();
     }
   }
 
@@ -775,11 +901,11 @@ export class SubtitleEditorComponent implements OnInit {
     if (this.dataRedoArray.length !== 0) {
       this.dataUndoArray.push(
         {
-          timeStamp: this.timeStamp.slice(), script: this.script.slice(),
-          scriptTranslation: this.scriptTranslation.slice(), preview: this.preview.slice()
+          timeStamp: JSON.parse(JSON.stringify(this.timeStamp)), script: this.script.slice(),
+          scriptTranslation: this.scriptTranslation.slice(), preview: JSON.parse(JSON.stringify(this.preview))
         });
       const currentData = this.dataRedoArray.pop();
-      this.timeStamp = currentData.timeStamp.slice();
+      this.timeStamp = currentData.timeStamp;
       this.script = currentData.script;
       this.scriptTranslation = currentData.scriptTranslation;
       this.preview = currentData.preview;
@@ -788,7 +914,7 @@ export class SubtitleEditorComponent implements OnInit {
         this.showRedo = false;
       }
       if (this.indexActive > this.timeStamp.length - 1) {
-        this.indexActive = this.timeStamp.length - 1;
+        this.indexActive = this.timeStamp.length ? this.timeStamp.length - 1 : null;
       }
     }
 
@@ -797,6 +923,13 @@ export class SubtitleEditorComponent implements OnInit {
     } else {
       this.showUndo = false;
     }
+    this.loadRegions();
+  }
+
+  updateIndexActive() {
+    const indexActiveTmp = this.indexActive;
+    this.indexActive = null;
+    setTimeout(() => this.indexActive = indexActiveTmp, 0);
   }
 
 }

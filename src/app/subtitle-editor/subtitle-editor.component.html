@@ -1,5 +1,5 @@
 <app-toolbar [subtitleList]="subtitleList" [projectKey]="projectKey" [videoId]="videoId" [projectName]="projectName"
-  [hasScript]="script.length === 0" [showUndo]="showUndo" [showRedo]="showRedo" (videoSelected)="videoSelected($event)"
+  [hasScript]="script.length === 0" [showUndo]="showUndo" [showRedo]="showRedo" [loading]="loading" (videoSelected)="videoSelected($event)"
   (yTLinkPlayed)="yTLinkPlayed($event)" (subtitleSelected)="subtitleSelected($event)"
   (translationSelected)="translationSelected($event)" (translate)="translate($event)"
   (chunkModeChanged)="chunkModeChanged($event)" (save)="onSave()" (load)="onLoad($event)"
