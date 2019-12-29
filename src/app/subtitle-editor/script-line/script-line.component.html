@@ -15,11 +15,12 @@
   </div>
   <div fxLayout="column" style="width: 100%;">
     <mat-form-field style="width: 100%; margin-bottom: -25px; margin-top: -14px" appearance="none">
-      <textarea #sentenceEdit matInput [(ngModel)]="script[index]" class="text-preview" rows="1"></textarea>
+      <textarea #scriptInput matInput [(ngModel)]="script[index]" class="text-preview" rows="1"
+        (click)="scriptInputFocused=true"></textarea>
     </mat-form-field>
     <hr class="underline">
     <mat-form-field style="width: 100%; margin-bottom: -25px; margin-top: -14px" appearance="none">
-      <textarea #translationEdit matInput [(ngModel)]="scriptTranslation[index]" class="text-preview"
+      <textarea #scriptTranslationInput matInput [(ngModel)]="scriptTranslation[index]" class="text-preview"
         rows="1"></textarea>
     </mat-form-field>
     <!-- <hr class="underline">

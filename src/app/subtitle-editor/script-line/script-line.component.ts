@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, SimpleChanges, OnChanges, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, SimpleChanges, OnChanges, ElementRef, ViewChild, Output, EventEmitter, HostListener } from '@angular/core';
 
 import { SubtitleParserService } from '../services/subtitle-parser.service';
 
@@ -19,6 +19,9 @@ export class ScriptLineComponent implements OnInit, OnChanges {
   @Input() indexActive: number;
   @ViewChild('startInput', { static: false }) startInput: ElementRef;
   @ViewChild('endInput', { static: false }) endInput: ElementRef;
+  @ViewChild('scriptInput', { static: false }) scriptInput: ElementRef;
+  @ViewChild('scriptTranslationInput', { static: false }) scriptTranslationInput: ElementRef;
+
   @Output() lineClick: EventEmitter<number> = new EventEmitter();
 
   startTime = '';
@@ -28,6 +31,33 @@ export class ScriptLineComponent implements OnInit, OnChanges {
 
   chunkTexts = [];
   chunks = [];
+
+  scriptInputFocused: boolean;
+
+  @HostListener('keydown', ['$event'])
+  keyEvent(event: KeyboardEvent) {
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (this.scriptInputFocused === false) {
+        this.scriptInput.nativeElement.focus();
+        this.scriptInputFocused = true;
+      } else {
+        if (this.indexActive !== 0) {
+          this.lineClick.next(this.indexActive - 1);
+        }
+      }
+    } else if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if (this.scriptInputFocused) {
+        this.scriptTranslationInput.nativeElement.focus();
+        this.scriptInputFocused = false;
+      } else {
+        if (this.indexActive !== this.script.length - 1) {
+          this.lineClick.next(this.indexActive + 1);
+        }
+      }
+    }
+  }
 
   constructor(private subtitleParserService: SubtitleParserService) { }
 
@@ -51,6 +81,12 @@ export class ScriptLineComponent implements OnInit, OnChanges {
         match = regex.exec(this.sentence);
       }
       this.chunkTexts = this.sentence.split(/[\s|]+/g);
+    }
+    if (changes.indexActive && !changes.indexActive.firstChange) {
+      if (this.index === this.indexActive && this.index !== null) {
+        setTimeout(() => this.scriptInput.nativeElement.focus(), 0);
+        this.scriptInputFocused = true;
+      }
     }
   }
 
