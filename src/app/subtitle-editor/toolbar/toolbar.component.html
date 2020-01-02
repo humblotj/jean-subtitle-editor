@@ -33,6 +33,14 @@
             <mat-icon svgIcon="content-copy"></mat-icon>
           </button>
           <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="onDownloadProject()" [disabled]="!hasScript">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="folder-download" style="margin-top: 8px;"></mat-icon>
+              <span
+                style="font-size: smaller;margin-top: -10px;">Download project</span>
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
         </div>
         <ng-template [ngTemplateOutlet]="commonButtons"></ng-template>
       </div>
@@ -117,7 +125,7 @@
           </div>
           <mat-divider [vertical]="true"></mat-divider>
           <div fxLayoutAlign="center center" style="margin-right: 12px;">
-            <button mat-button (click)="onTranslate()" [disabled]="hasScript||loading">
+            <button mat-button (click)="onTranslate()" [disabled]="!hasScript||loading">
               <div fxLayout="column" fxLayoutAlign="center center">
                 <mat-icon svgIcon="translate" style="margin-top: 8px;"></mat-icon>
                 <span style="font-size: smaller;margin-top: -10px;">Translate</span>
@@ -144,25 +152,27 @@
             </mat-form-field>
           </div>
           <mat-divider [vertical]="true"></mat-divider>
-          <button mat-button [matMenuTriggerFor]="menuExportSubtitle" [disabled]="hasScript">
+          <button mat-button [matMenuTriggerFor]="menuExportSubtitle" [disabled]="!hasScript">
             <div fxLayout="column" fxLayoutAlign="center center">
-              <mat-icon svgIcon="subtitles-outline" style="margin-top: 8px;"></mat-icon>
+              <mat-icon svgIcon="file-download-outline" style="margin-top: 8px;"></mat-icon>
               <span style="font-size: smaller;margin-top: -10px;">Export Subtitle</span>
             </div>
           </button>
           <mat-menu #menuExportSubtitle="matMenu">
-            <button mat-menu-item *ngFor="let extension of extensions" (click)="onExportSubtitle(extension)">
+            <button mat-menu-item *ngFor="let extension of extensions" (click)="onExportSubtitle(extension)"
+              [disabled]="extension === 'ass' || extension === 'mss'">
               as .{{extension}}
             </button>
           </mat-menu>
-          <button mat-button [matMenuTriggerFor]="menuExport" [disabled]="hasScript">
+          <button mat-button [matMenuTriggerFor]="menuExport" [disabled]="!hasScript">
             <div fxLayout="column" fxLayoutAlign="center center">
-              <mat-icon svgIcon="subtitles" style="margin-top: 8px;"></mat-icon>
+              <mat-icon svgIcon="file-download" style="margin-top: 8px;"></mat-icon>
               <span style="font-size: smaller;margin-top: -10px;">Export Translation</span>
             </div>
           </button>
           <mat-menu #menuExport="matMenu">
-            <button mat-menu-item *ngFor="let extension of extensions" (click)="onExportTranslation(extension)">
+            <button mat-menu-item *ngFor="let extension of extensions" (click)="onExportTranslation(extension)"
+              [disabled]="extension === 'ass' || extension === 'mss'">
               as .{{extension}}
             </button>
           </mat-menu>
@@ -174,7 +184,38 @@
     <mat-tab label="Edit">
       <div fxLayoutAlign="space-between">
         <div fxLayoutAlign="start stretch">
-          <button mat-button (click)="onChunkMode()" [disabled]="hasScript">
+          <button mat-button (click)="onRemoveEmptySentences()" [disabled]="!hasScript">
+            <div style="font-size: smaller; white-space: pre-wrap; line-height: 18px;">{{"Remove\nempty sentences"}}
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="onFixOverlapping()" [disabled]="!hasScript">
+            <div style="font-size: smaller; white-space: pre-wrap; line-height: 18px;">{{"Fix overlapping\nsentences"}}
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+          <mat-form-field flexLayout="row" style="margin-left: 12px;margin-top:10px" [style.width.px]="50">
+            <input matInput type="number" #keyInput placeholder="Max char" [(ngModel)]="maxCharSentence">
+          </mat-form-field>
+          <button mat-button (click)="onMergeToSentences()" [disabled]="!hasScript">
+            <div style="font-size: smaller; white-space: pre-wrap; line-height: 18px;">{{"Merge\nto sentences"}}</div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="onShiftTimes()" [disabled]="!hasScript">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="timer" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Shift Times</span>
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+        </div>
+        <ng-template [ngTemplateOutlet]="commonButtons"></ng-template>
+      </div>
+    </mat-tab>
+    <mat-tab label="Chunk">
+      <div fxLayoutAlign="space-between">
+        <div fxLayoutAlign="start stretch">
+          <button mat-button (click)="onChunkMode()" [disabled]="!hasScript">
             <div fxLayout="column" fxLayoutAlign="center center">
               <mat-icon *ngIf="!chunkMode" svgIcon="format-horizontal-align-center" style="margin-top: 8px;"></mat-icon>
               <mat-icon *ngIf="chunkMode" svgIcon="close-box" style="margin-top: 8px;"></mat-icon>
@@ -182,7 +223,7 @@
             </div>
           </button>
           <mat-divider [vertical]="true"></mat-divider>
-          <button mat-button (click)="onAutoChunk()" [disabled]="hasScript||chunkMode||loading">
+          <button mat-button (click)="onAutoChunk()" [disabled]="!hasScript||chunkMode||loading">
             <div fxLayout="column" fxLayoutAlign="center center">
               <mat-icon svgIcon="atom-variant" style="margin-top: 8px;"></mat-icon>
               <span style="font-size: smaller;margin-top: -10px;">Auto Chunk</span>
@@ -200,7 +241,7 @@
   <div fxLayoutAlign="start stretch">
     <mat-spinner *ngIf="loading" [diameter]="30" style="margin: auto 12px;"></mat-spinner>
     <mat-divider [vertical]="true"></mat-divider>
-    <button mat-button (click)="onSave()" [disabled]="hasScript">
+    <button mat-button (click)="onSave()" [disabled]="!hasScript">
       <div fxLayout="column" fxLayoutAlign="center center">
         <mat-icon svgIcon="content-save" style="margin-top: 8px;"></mat-icon>
         <span style="font-size: smaller;margin-top: -10px;">Save Project</span>

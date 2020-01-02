@@ -20,10 +20,15 @@ export class ToolbarComponent implements OnInit, OnChanges {
   @Output() chunkModeChanged: EventEmitter<boolean> = new EventEmitter();
   @Output() save: EventEmitter<null> = new EventEmitter();
   @Output() load: EventEmitter<string> = new EventEmitter();
+  @Output() downloadProject: EventEmitter<null> = new EventEmitter();
   @Output() projectNameChanged: EventEmitter<string> = new EventEmitter();
   @Output() autoChunk: EventEmitter<null> = new EventEmitter();
   @Output() undoEmit: EventEmitter<null> = new EventEmitter();
   @Output() redoEmit: EventEmitter<null> = new EventEmitter();
+  @Output() removeEmptySentences: EventEmitter<null> = new EventEmitter();
+  @Output() fixOverlapping: EventEmitter<null> = new EventEmitter();
+  @Output() mergeToSentences: EventEmitter<number> = new EventEmitter();
+  @Output() shiftTimes: EventEmitter<null> = new EventEmitter();
 
   @Input() subtitleList: { name: string, lang_code: string, lang_translated: string }[];
   @Input() hasScript: boolean;
@@ -33,7 +38,6 @@ export class ToolbarComponent implements OnInit, OnChanges {
   @Input() showUndo: boolean;
   @Input() showRedo: boolean;
   @Input() loading: boolean;
-
 
   inputProjectKey = '';
   youtubeLink = '';
@@ -61,7 +65,11 @@ export class ToolbarComponent implements OnInit, OnChanges {
 
   chunkMode = false;
 
-  constructor(private toolsService: ToolsService, private subtitleParserService: SubtitleParserService, private http: HttpClient) { }
+  maxCharSentence = 1000;
+
+  constructor(private toolsService: ToolsService,
+    private subtitleParserService: SubtitleParserService,
+    private http: HttpClient) { }
 
   ngOnInit() {
   }
@@ -222,11 +230,15 @@ export class ToolbarComponent implements OnInit, OnChanges {
   }
 
   onSave() {
-    this.save.next(null);
+    this.save.next();
   }
 
   onLoad() {
     this.load.next(this.inputProjectKey);
+  }
+
+  onDownloadProject() {
+    this.downloadProject.next();
   }
 
   onProjectNameChanged(name: string) {
@@ -239,5 +251,21 @@ export class ToolbarComponent implements OnInit, OnChanges {
 
   redo() {
     this.redoEmit.next();
+  }
+
+  onRemoveEmptySentences() {
+    this.removeEmptySentences.next();
+  }
+
+  onFixOverlapping() {
+    this.fixOverlapping.next();
+  }
+
+  onMergeToSentences() {
+    this.mergeToSentences.next(this.maxCharSentence);
+  }
+
+  onShiftTimes() {
+    this.shiftTimes.next();
   }
 }

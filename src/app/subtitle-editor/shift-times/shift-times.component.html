@@ -1,0 +1,32 @@
+<mat-dialog-content fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="10px"
+  style="padding-top:10px;padding-bottom: 10px">
+  <div fxLayout="row" fxLayoutGap="10px">
+    <span>Time:</span>
+    <input type="text" matInput #timeInput [ngModel]="time" (focus)="oldTimeMs=$event.target.value"
+      (focusout)="updateTime($event)" pattern="^[0-5][0-9]:[0-5][0-9].[0-9]{2}">
+  </div>
+  <mat-radio-group [(ngModel)]="forward" fxLayout="row" fxLayoutGap="4px">
+    <mat-radio-button value="1" color="primary">Forward</mat-radio-button>
+    <mat-radio-button value="0" color="primary">Backward</mat-radio-button>
+  </mat-radio-group>
+  <div fxLayout="row" fxLayoutGap="10px">
+    <mat-form-field>
+      <input matInput type="number" placeholder="Start Row" [(ngModel)]="begin" (focus)="updateOldBegin($event)"
+        (focusout)="updateBegin($event)" required>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="number" placeholder="End Row" [(ngModel)]="end" (focus)="updateOldEnd($event)"
+        (focusout)="updateEnd($event)" required>
+    </mat-form-field>
+  </div>
+  <mat-radio-group [(ngModel)]="times" fxLayout.gt-xs="row" fxLayout.xs="column" fxLayoutGap="4px">
+    <mat-radio-button value="both" color="primary">Start and End times</mat-radio-button>
+    <mat-radio-button value="start" color="primary">Start times only</mat-radio-button>
+    <mat-radio-button value="end" color="primary">End times only</mat-radio-button>
+  </mat-radio-group>
+  <div fxLayoutAlign="end" style="width: 100%;">
+    <button mat-stroked-button (click)="shiftTimes()">
+      Shift times
+    </button>
+  </div>
+</mat-dialog-content>

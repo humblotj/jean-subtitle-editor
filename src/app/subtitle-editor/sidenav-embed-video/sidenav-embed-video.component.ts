@@ -165,5 +165,4 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
   onVolumeChange(event) {
     this.audioVolumeChanged.emit(event.value);
   }
-
 }

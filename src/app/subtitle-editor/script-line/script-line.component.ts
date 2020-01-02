@@ -8,9 +8,12 @@ import { SubtitleParserService } from '../services/subtitle-parser.service';
   styleUrls: ['./script-line.component.css']
 })
 export class ScriptLineComponent implements OnInit, OnChanges {
+  @Input() previousEndMs: number;
+  @Input() nextStartMs: number;
   @Input() time: { startMs: number, endMs: number };
   @Input() startMs: number;
   @Input() endMs: number;
+  @Input() timeStamp: { startMs: number, endMs: number }[];
   @Input() script: string[];
   @Input() scriptTranslation: string[];
   @Input() sentence: string;
@@ -23,11 +26,14 @@ export class ScriptLineComponent implements OnInit, OnChanges {
   @ViewChild('scriptTranslationInput', { static: false }) scriptTranslationInput: ElementRef;
 
   @Output() lineClick: EventEmitter<number> = new EventEmitter();
+  private clicked = false;
 
   startTime = '';
   endTime = '';
   oldStart: string;
   oldEnd: string;
+  overlappingBegin = false;
+  overlappingEnd = false;
 
   chunkTexts = [];
   chunks = [];
@@ -71,6 +77,16 @@ export class ScriptLineComponent implements OnInit, OnChanges {
     if (changes.endMs || changes.index) {
       this.endTime = this.subtitleParserService.msToTime(this.endMs);
     }
+    if (changes.startMs || changes.previousEndMs) {
+      if (this.previousEndMs !== null) {
+        this.overlappingBegin = this.startMs < this.previousEndMs;
+      }
+    }
+    if (changes.endMs || changes.nextStartMs) {
+      if (this.nextStartMs !== null) {
+        this.overlappingEnd = this.endMs > this.nextStartMs;
+      }
+    }
     if (changes.sentence) {
       this.chunkTexts = [];
       this.chunks = [];
@@ -83,9 +99,16 @@ export class ScriptLineComponent implements OnInit, OnChanges {
       this.chunkTexts = this.sentence.split(/[\s|]+/g);
     }
     if (changes.indexActive && !changes.indexActive.firstChange) {
-      if (this.index === this.indexActive && this.index !== null) {
-        setTimeout(() => this.scriptInput.nativeElement.focus(), 0);
-        this.scriptInputFocused = true;
+      if (this.index === this.indexActive && this.index !== null && !this.clicked) {
+        if (changes.indexActive.previousValue < changes.indexActive.currentValue) {
+          setTimeout(() => this.scriptInput.nativeElement.focus(), 0);
+          this.scriptInputFocused = true;
+        } else {
+          setTimeout(() => this.scriptTranslationInput.nativeElement.focus(), 0);
+          this.scriptInputFocused = false;
+        }
+      } else {
+        this.clicked = false;
       }
     }
   }
@@ -118,6 +141,7 @@ export class ScriptLineComponent implements OnInit, OnChanges {
 
   onLineClick() {
     if (this.indexActive !== this.index) {
+      this.clicked = true;
       this.lineClick.next(this.index);
     }
   }

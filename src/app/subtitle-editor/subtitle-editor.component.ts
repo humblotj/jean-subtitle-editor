@@ -2,9 +2,10 @@ import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { take } from 'rxjs/operators';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { MatMenuTrigger } from '@angular/material';
+import { MatMenuTrigger, MatDialog } from '@angular/material';
 import * as xml2js from 'xml2js';
 import * as FileSaver from 'file-saver';
+import * as JSZip from 'jszip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 
@@ -14,6 +15,7 @@ import { TranslateService } from './services/translate.service';
 import { SubtitleParserService } from './services/subtitle-parser.service';
 import { MglishService } from './services/mglish.service';
 import { MglishnlService } from './services/mglishnl.service';
+import { ShiftTimesComponent } from './shift-times/shift-times.component';
 
 @Component({
   selector: 'app-subtitle-editor',
@@ -89,6 +91,7 @@ export class SubtitleEditorComponent implements OnInit {
     private router: Router,
     private location: Location,
     private http: HttpClient,
+    private matDialog: MatDialog,
     private dataStorageService: DataStorageService,
     private toolsService: ToolsService,
     private translateService: TranslateService,
@@ -266,7 +269,7 @@ export class SubtitleEditorComponent implements OnInit {
     }
   }
 
-  export(event: { extensionExport: string, script: boolean }) {
+  onExportSubtitle(event: { extensionExport: string, script: boolean }) {
     let blob: Blob;
     const text = event.script ? this.script : this.scriptTranslation;
     switch (event.extensionExport) {
@@ -304,7 +307,37 @@ export class SubtitleEditorComponent implements OnInit {
       }
     }
     const lang = event.script ? 'ko' : 'en';
-    FileSaver.saveAs(blob, this.projectName + lang + '.' + event.extensionExport);
+    FileSaver.saveAs(blob, this.projectName + '_' + lang + '.' + event.extensionExport);
+  }
+
+  onDownloadProject() {
+    const zip: JSZip = new JSZip();
+    let dataJSON = this.timeStamp.map((line, index: number) => {
+      return {
+        id: index,
+        start: line.startMs,
+        end: line.endMs,
+        text: this.script[index].replace(/\{(.*?)\}/gi, '').trim()
+      };
+    });
+    let dataFile = this.subtitleParserService.build(dataJSON, 'srt');
+    zip.file(this.projectName.replace(/\.[^/.]+$/, '') + '_en.srt', dataFile);
+
+    dataJSON = this.timeStamp.map((line, index: number) => {
+      return {
+        id: index,
+        start: line.startMs,
+        end: line.endMs,
+        text: this.scriptTranslation[index].replace(/\{(.*?)\}/gi, '').trim()
+      };
+    });
+    dataFile = this.subtitleParserService.build(dataJSON, 'srt');
+    zip.file(this.projectName.replace(/\.[^/.]+$/, '') + '_ko.srt', dataFile);
+
+    zip.generateAsync({ type: 'blob' })
+      .then(content => {
+        FileSaver.saveAs(content, this.projectName.replace(/\.[^/.]+$/, '') + '.zip');
+      });
   }
 
   playerInitialized(player: any) {
@@ -341,6 +374,9 @@ export class SubtitleEditorComponent implements OnInit {
     this.wavesurfer.on('region-click', (event) => {
       if (event.id !== this.indexActive) {
         this.setIndexActive(event.id);
+        if (this.viewPort) {
+          this.viewPort.scrollToIndex((this.indexActive - 1), 'smooth');
+        }
         this.pause();
       }
     });
@@ -639,6 +675,48 @@ export class SubtitleEditorComponent implements OnInit {
     this.loadRegions();
   }
 
+  insertLeft(index: number) {
+    this.do();
+    const start = this.timeStamp[index].endMs;
+    let end = index === this.timeStamp.length - 1 ?
+      this.timeStamp[index].endMs : this.timeStamp[index + 1].startMs;
+
+    end = Math.max(+start, +end);
+
+    this.timeStamp[this.timeStamp.length] = {
+      startMs: this.timeStamp[this.timeStamp.length - 1].endMs,
+      endMs: this.timeStamp[this.timeStamp.length - 1].endMs
+    };
+    this.script.splice(index, 0, '');
+    this.scriptTranslation[this.scriptTranslation.length] = '';
+    this.preview.splice(index, 0, { en: '', ko: '', rpa: '' });
+
+    this.timeStamp = this.timeStamp.slice();
+
+    this.loadRegions();
+  }
+
+  insertRight(index: number) {
+    this.do();
+    const start = this.timeStamp[index].endMs;
+    let end = index === this.timeStamp.length - 1 ?
+      this.timeStamp[index].endMs : this.timeStamp[index + 1].startMs;
+
+    end = Math.max(+start, +end);
+
+    this.timeStamp[this.timeStamp.length] = {
+      startMs: this.timeStamp[this.timeStamp.length - 1].endMs,
+      endMs: this.timeStamp[this.timeStamp.length - 1].endMs
+    };
+    this.script[this.script.length] = '';
+    this.scriptTranslation.splice(index, 0, '');
+    this.preview[this.preview.length] = { en: '', ko: '', rpa: '' };
+
+    this.timeStamp = this.timeStamp.slice();
+
+    this.loadRegions();
+  }
+
 
   duplicate(index: number) {
     this.do();
@@ -773,7 +851,9 @@ export class SubtitleEditorComponent implements OnInit {
           this.preview[i] = { en: '', ko: '', rpa: '' };
         }
 
-        this.yTLinkPlayed(data.videoId);
+        if (data.videoId) {
+          this.yTLinkPlayed(data.videoId);
+        }
 
         const dataJSON = this.timeStamp.map((line, index: number) => {
           return {
@@ -930,6 +1010,98 @@ export class SubtitleEditorComponent implements OnInit {
     const indexActiveTmp = this.indexActive;
     this.indexActive = null;
     setTimeout(() => this.indexActive = indexActiveTmp, 0);
+  }
+
+  onRemoveEmptySentences() {
+    this.do();
+    let i = this.timeStamp.length;
+    while (i--) {
+      if (this.script[i] === '') {
+        this.timeStamp.splice(i, 1);
+        this.script.splice(i, 1);
+        this.scriptTranslation.splice(i, 1);
+        this.preview.splice(i, 1);
+      }
+    }
+    this.timeStamp = this.timeStamp.slice();
+  }
+
+  onFixOverlapping() {
+    this.do();
+    for (let i = 0; i < this.timeStamp.length - 1; i++) {
+      if (this.timeStamp[i].endMs > this.timeStamp[i + 1].startMs) {
+        this.timeStamp[i].endMs = this.timeStamp[i + 1].startMs;
+      }
+    }
+  }
+
+  onMergeToSentences(maxCharSentence: number) {
+    this.do();
+    let i = this.timeStamp.length;
+    const regexEnd = /[^.?!)]$/g;
+    // const regexBegin = /^[a-z]/g;
+    while (i--) {
+      if (i === 0) {
+        break;
+      }
+      if (this.script[i - 1].match(regexEnd) /*&& script[i].sentence.match(regexBegin)*/) {
+        const newScript = this.script[i - 1].trim() + ' ' + this.script[i].trim();
+        if (newScript.length < maxCharSentence) {
+          this.timeStamp[i - 1] = { startMs: this.timeStamp[i - 1].startMs, endMs: this.timeStamp[i].endMs };
+          this.timeStamp.splice(i, 1);
+          this.script[i - 1] = newScript;
+          this.script.splice(i, 1);
+          this.scriptTranslation[i - 1] = this.scriptTranslation[i - 1].trim() + ' ' + this.scriptTranslation[i].trim();
+          this.scriptTranslation.splice(i, 1);
+          this.preview[i - 1] = {
+            en: this.preview[i - 1].en.trim() + ' ' + this.preview[i].en.trim(),
+            ko: this.preview[i - 1].ko.trim() + ' ' + this.preview[i].ko.trim(),
+            rpa: this.preview[i - 1].rpa.trim() + ' ' + this.preview[i].rpa.trim()
+          };
+          this.preview.splice(i, 1);
+        }
+      }
+    }
+    this.timeStamp = this.timeStamp.slice();
+    if (this.indexActive > this.timeStamp.length - 1) {
+      this.indexActive = this.timeStamp.length - 1;
+    }
+  }
+
+  onShiftTimes() {
+    const dialogRef = this.matDialog.open(ShiftTimesComponent, { data: { length: this.timeStamp.length } });
+    dialogRef.afterClosed().pipe(take(1)).subscribe((result) => {
+      if (result) {
+        this.do();
+        if (!result.forward) {
+          const timeMs = -result.timeMs;
+          for (let i = result.begin - 1; i <= result.end - 1; i++) {
+            if (result.times === 'start' || result.times === 'both') {
+              this.timeStamp[i].startMs += timeMs;
+              if (this.timeStamp[i].startMs < 0) {
+                this.timeStamp[i].startMs = 0;
+              }
+            }
+            if (result.times === 'end' || result.times === 'both') {
+              this.timeStamp[i].endMs += timeMs;
+              if (this.timeStamp[i].endMs < 0) {
+                this.timeStamp[i].endMs = 0;
+              }
+            }
+          }
+        } else {
+          for (let i = result.begin - 1; i <= result.end - 1; i++) {
+            if (result.times === 'start' || result.times === 'both') {
+              this.timeStamp[i].startMs += result.timeMs;
+            }
+            if (result.times === 'end' || result.times === 'both') {
+              this.timeStamp[i].endMs += result.timeMs;
+            }
+          }
+        }
+        this.loadRegions();
+      }
+    });
   }
 
 }
