@@ -20,11 +20,13 @@ export class ScriptLineComponent implements OnInit, OnChanges {
   @Input() translation: string;
   @Input() index: number;
   @Input() indexActive: number;
+  @Input() paused: number;
   @ViewChild('startInput', { static: false }) startInput: ElementRef;
   @ViewChild('endInput', { static: false }) endInput: ElementRef;
   @ViewChild('scriptInput', { static: false }) scriptInput: ElementRef;
   @ViewChild('scriptTranslationInput', { static: false }) scriptTranslationInput: ElementRef;
-
+  @Output() playRegion: EventEmitter<null> = new EventEmitter();
+  @Output() pause: EventEmitter<null> = new EventEmitter();
   @Output() lineClick: EventEmitter<number> = new EventEmitter();
   private clicked = false;
 
@@ -144,5 +146,15 @@ export class ScriptLineComponent implements OnInit, OnChanges {
       this.clicked = true;
       this.lineClick.next(this.index);
     }
+  }
+
+  onPlayRegion() {
+    if (this.indexActive === this.index) {
+      this.playRegion.next();
+    }
+  }
+
+  onPause() {
+    this.pause.next();
   }
 }

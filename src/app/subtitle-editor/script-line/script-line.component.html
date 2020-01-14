@@ -1,6 +1,13 @@
 <div fxLayout="row" [ngClass]="{'script-container': true, 'active': indexActive === index}"
   fxLayoutAlign="center center" (click)="onLineClick()">
-  <span style="font-size: small; margin-left: 12px">{{index+1}}</span>
+  <div fxLayout="column" fxLayoutAlign="center center" style="margin-top: 8px;">
+    <span style="font-size: small">{{index+1}}</span>
+    <mat-icon *ngIf="paused || indexActive !== index" style="transform: scale(0.6); margin-top: -3px; cursor: pointer;"
+      (click)="onPlayRegion()">
+      play_arrow</mat-icon>
+    <mat-icon *ngIf="!paused && indexActive === index" style="transform: scale(0.6); margin-top: -3px; cursor: pointer;"
+      (click)="onPause()">pause</mat-icon>
+  </div>
   <div fxLayout="column" fxLayoutAlign="center center" style="margin-left: 12px; margin-top: 10px;">
     <!-- <span style="color: gray; font-size: small;">{{startTime}}</span>
     <span style="color: gray; font-size: small;">{{endTime}}</span> -->

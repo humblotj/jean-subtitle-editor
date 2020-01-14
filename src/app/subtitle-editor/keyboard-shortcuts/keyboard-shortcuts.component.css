@@ -1,0 +1,8 @@
+.mat-grid-tile .mat-figure {
+  justify-content: flex-start !important;
+  padding: 0 10px!important;
+}
+
+mat-grid-tile {
+  background: rgb(240,240,240);
+}

@@ -16,6 +16,8 @@ import { SubtitleParserService } from './services/subtitle-parser.service';
 import { MglishService } from './services/mglish.service';
 import { MglishnlService } from './services/mglishnl.service';
 import { ShiftTimesComponent } from './shift-times/shift-times.component';
+import { HowToUseComponent } from './how-to-use/how-to-use.component';
+import { KeyboardShortcutsComponent } from './keyboard-shortcuts/keyboard-shortcuts.component';
 
 @Component({
   selector: 'app-subtitle-editor',
@@ -29,10 +31,12 @@ export class SubtitleEditorComponent implements OnInit {
 
   player = null;
   wavesurfer = null;
+  rate = 1;
   url = '';
   videoType = '';
   videoId = '';
   subtitleList: string[] = [];
+  paused = true;
 
   loading = false;
   errorMessage = '';
@@ -44,6 +48,9 @@ export class SubtitleEditorComponent implements OnInit {
   private labelSelected = 'original text';
 
   chunkMode = false;
+
+  private timeout = null;
+  private onTimeUpdate = null;
 
   @ViewChild(CdkVirtualScrollViewport, { static: false }) viewPort: CdkVirtualScrollViewport;
   timeStamp: { startMs: number, endMs: number }[] = [];
@@ -72,20 +79,18 @@ export class SubtitleEditorComponent implements OnInit {
   showUndo = false;
   showRedo = false;
 
-  // @HostListener('keydown', ['$event'])
-  // keyEvent(event: KeyboardEvent) {
-  //   if (event.key === 'ArrowUp') {
-  //     event.preventDefault();
-  //     if (this.indexActive !== 0) {
-  //       this.setIndexActive(this.indexActive - 1);
-  //     }
-  //   } else if (event.key === 'ArrowDown') {
-  //     event.preventDefault();
-  //     if (this.indexActive !== this.timeStamp.length - 1) {
-  //       this.setIndexActive(this.indexActive + 1);
-  //     }
-  //   }
-  // }
+  @HostListener('keydown', ['$event'])
+  keyEvent(event: KeyboardEvent) {
+    if (event.shiftKey && event.key === 'ArrowRight') {
+      event.preventDefault();
+
+      if (this.paused === true) {
+        this.onPlayRegion();
+      } else {
+        this.pause();
+      }
+    }
+  }
 
   constructor(private route: ActivatedRoute,
     private router: Router,
@@ -100,6 +105,7 @@ export class SubtitleEditorComponent implements OnInit {
     private mglishNLService: MglishnlService) { }
 
   ngOnInit() {
+    this.matDialog.open(HowToUseComponent);
     const id = this.route.snapshot.queryParams.id;
     if (typeof id !== 'undefined') {
       this.projectKey = id;
@@ -372,6 +378,9 @@ export class SubtitleEditorComponent implements OnInit {
     });
 
     this.wavesurfer.on('region-click', (event) => {
+      clearTimeout(this.timeout);
+      this.timeout = null;
+
       if (event.id !== this.indexActive) {
         this.setIndexActive(event.id);
         if (this.viewPort) {
@@ -382,12 +391,15 @@ export class SubtitleEditorComponent implements OnInit {
     });
 
     this.wavesurfer.on('region-in', (event) => {
-      if (event.id !== this.indexActive && this.repeatTimeout === null) {
+      if (event.id !== this.indexActive && this.repeatTimeout === null && this.timeout === null) {
         if (this.timeStamp[event.id].startMs - this.timeStamp[this.indexActive].startMs > 300) {
           this.setIndexActive(event.id);
         }
       }
     });
+
+    wavesurfer.on('pause', () => this.paused = true);
+    wavesurfer.on('play', () => this.paused = false);
   }
 
   setIndexActive(index: number) {
@@ -441,8 +453,14 @@ export class SubtitleEditorComponent implements OnInit {
 
   pause() {
     clearTimeout(this.repeatTimeout);
+    clearTimeout(this.timeout);
+    this.timeout = null;
     this.repeatTimeout = null;
     if (this.player) {
+      if (this.onTimeUpdate) {
+        this.player.off('timeupdate', this.onTimeUpdate);
+        this.onTimeUpdate = null;
+      }
       this.player.pause();
     }
     if (this.wavesurfer) {
@@ -461,11 +479,12 @@ export class SubtitleEditorComponent implements OnInit {
 
   onPlayButton(play: boolean) {
     if (play) {
+      clearTimeout(this.timeout);
+      this.timeout = null;
       this.player.play();
       this.wavesurfer.play();
     } else {
-      this.player.pause();
-      this.wavesurfer.pause();
+      this.pause();
     }
   }
 
@@ -1104,4 +1123,49 @@ export class SubtitleEditorComponent implements OnInit {
     });
   }
 
+  onPlayRegion() {
+    if (this.indexActive !== null) {
+      const time = this.timeStamp[this.indexActive];
+      this.playInterval(time.startMs / 1000, time.endMs / 1000);
+    }
+  }
+
+  playInterval(start: number, end: number) {
+    clearTimeout(this.timeout);
+
+    if (start < end - 0.5 && this.wavesurfer !== null) {
+      if (this.player === null) {
+        this.wavesurfer.seekAndCenter(start / this.wavesurfer.getDuration());
+        this.wavesurfer.play(start, end);
+        this.timeout = setTimeout(() => {
+          this.wavesurfer.seekAndCenter(end / this.wavesurfer.getDuration());
+          this.wavesurfer.pause();
+        }, (end - start) * 1000 / this.rate);
+      } else {
+        this.wavesurfer.seekAndCenter(start / this.wavesurfer.getDuration());
+        this.player.currentTime(start);
+        this.player.play();
+        this.wavesurfer.play(start, end);
+        this.player.on('timeupdate', this.onTimeUpdate = e => {
+          // current time is given in seconds
+          if (this.player.currentTime() >= end) {
+            this.player.pause();
+            this.player.off('timeupdate', this.onTimeUpdate);
+          }
+        });
+        this.timeout = setTimeout(() => {
+          this.wavesurfer.seekAndCenter(end / this.wavesurfer.getDuration());
+          this.wavesurfer.pause();
+        }, (end - start) * 1000 / this.rate);
+      }
+    }
+  }
+
+  onOpenHTU() {
+    this.matDialog.open(HowToUseComponent);
+  }
+
+  onOpenKS() {
+    this.matDialog.open(KeyboardShortcutsComponent);
+  }
 }

@@ -22,9 +22,10 @@ import {
   MatListModule,
   MatSlideToggleModule,
   MatRadioModule,
+  MatGridListModule,
 } from '@angular/material';
 
-import {DragDropModule} from '@angular/cdk/drag-drop';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   exports: [
@@ -50,7 +51,8 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
     MatListModule,
     MatSlideToggleModule,
     MatRadioModule,
-    DragDropModule
+    DragDropModule,
+    MatGridListModule
   ],
   declarations: []
 })

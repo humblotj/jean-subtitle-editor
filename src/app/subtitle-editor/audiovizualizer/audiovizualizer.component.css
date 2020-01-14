@@ -1,3 +1,11 @@
 .hidden {
   display: none;
 }
+
+.wavesurfer-region {
+  height: calc(100% - 10px) !important;
+}
+
+.wavesurfer-handle {
+  background-color: indianred !important;
+}

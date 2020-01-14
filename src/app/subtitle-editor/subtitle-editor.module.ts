@@ -16,6 +16,8 @@ import { DetailSentenceRendererComponent } from './sidenav-embed-video/detail-se
 import { MssRendererComponent } from './sidenav-embed-video/mss-renderer/mss-renderer.component';
 import { ScriptLineChunkComponent } from './script-line-chunk/script-line-chunk.component';
 import { ShiftTimesComponent } from './shift-times/shift-times.component';
+import { HowToUseComponent } from './how-to-use/how-to-use.component';
+import { KeyboardShortcutsComponent } from './keyboard-shortcuts/keyboard-shortcuts.component';
 
 @NgModule({
   declarations: [SubtitleEditorComponent,
@@ -27,7 +29,9 @@ import { ShiftTimesComponent } from './shift-times/shift-times.component';
     DetailSentenceRendererComponent,
     MssRendererComponent,
     ScriptLineChunkComponent,
-    ShiftTimesComponent
+    ShiftTimesComponent,
+    HowToUseComponent,
+    KeyboardShortcutsComponent
   ],
   imports: [
     SharedModule,
@@ -38,7 +42,9 @@ import { ShiftTimesComponent } from './shift-times/shift-times.component';
     AngularFireStorageModule,
   ],
   entryComponents: [
-    ShiftTimesComponent
+    ShiftTimesComponent,
+    HowToUseComponent,
+    KeyboardShortcutsComponent
   ],
 })
 export class SubtitleEditorModule { }

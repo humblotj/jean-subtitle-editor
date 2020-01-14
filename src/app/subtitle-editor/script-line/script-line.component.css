@@ -30,3 +30,9 @@
 /* ::ng-deep .mat-input-underline {
   display: none;
 } */
+
+::ng-deep.size-24 button svg {
+  width: 24px;
+  height: 24px;
+  transform: scale(0.5);
+}

@@ -36,8 +36,7 @@
           <button mat-button (click)="onDownloadProject()" [disabled]="!hasScript">
             <div fxLayout="column" fxLayoutAlign="center center">
               <mat-icon svgIcon="folder-download" style="margin-top: 8px;"></mat-icon>
-              <span
-                style="font-size: smaller;margin-top: -10px;">Download project</span>
+              <span style="font-size: smaller;margin-top: -10px;">Download project</span>
             </div>
           </button>
           <mat-divider [vertical]="true"></mat-divider>
@@ -227,6 +226,27 @@
             <div fxLayout="column" fxLayoutAlign="center center">
               <mat-icon svgIcon="atom-variant" style="margin-top: 8px;"></mat-icon>
               <span style="font-size: smaller;margin-top: -10px;">Auto Chunk</span>
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+        </div>
+        <ng-template [ngTemplateOutlet]="commonButtons"></ng-template>
+      </div>
+    </mat-tab>
+    <mat-tab label="Help">
+      <div fxLayoutAlign="space-between">
+        <div fxLayoutAlign="start stretch">
+          <button mat-button (click)="onOpenHTU()">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="help-circle-outline" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">How to use</span>
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="onOpenKS()">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="keyboard" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">Keyboard Shortcuts</span>
             </div>
           </button>
           <mat-divider [vertical]="true"></mat-divider>

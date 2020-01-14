@@ -13,8 +13,11 @@ export class AudiovizualizerComponent implements OnInit, OnChanges {
   @Input() url: string;
   @Output() wavesurferInitialized: EventEmitter<any> = new EventEmitter();
   @Output() seekTo: EventEmitter<number> = new EventEmitter();
+  @Output() playRegion: EventEmitter<null> = new EventEmitter();
+  @Output() pause: EventEmitter<null> = new EventEmitter();
 
   progressRate = 100;
+  paused = true;
 
   constructor() { }
 
@@ -39,8 +42,7 @@ export class AudiovizualizerComponent implements OnInit, OnChanges {
       interact: true,
       minPxPerSec: 1,
       plugins: [
-        RegionsPlugin.create({
-        }),
+        RegionsPlugin.create({}),
         TimelinePlugin.create({
           container: '#waveform-timeline'
         })
@@ -65,5 +67,13 @@ export class AudiovizualizerComponent implements OnInit, OnChanges {
     });
 
     this.wavesurferInitialized.emit(wavesurfer);
+  }
+
+  onPlayRegion() {
+    this.playRegion.next();
+  }
+
+  onPause() {
+    this.pause.next();
   }
 }

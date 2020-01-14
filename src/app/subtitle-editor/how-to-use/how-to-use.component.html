@@ -1,0 +1,13 @@
+<h3>How to use</h3>
+<div fxLayout="row">
+  <button mat-icon-button (click)="previous()" style="margin: auto; margin-left: -24px;">
+    <mat-icon svgIcon="arrow-left"></mat-icon>
+  </button>
+  <div>
+    <div style="margin-bottom: 20px;">{{texts[index]}}</div>
+    <img [src]="srcs[index]" style="width: 100%;">
+  </div>
+  <button mat-icon-button (click)="next()" style="margin: auto; margin-right: -24px;">
+    <mat-icon svgIcon="arrow-right"></mat-icon>
+  </button>
+</div>

@@ -29,6 +29,9 @@ export class ToolbarComponent implements OnInit, OnChanges {
   @Output() fixOverlapping: EventEmitter<null> = new EventEmitter();
   @Output() mergeToSentences: EventEmitter<number> = new EventEmitter();
   @Output() shiftTimes: EventEmitter<null> = new EventEmitter();
+  @Output() openHTU: EventEmitter<null> = new EventEmitter();
+  @Output() openKS: EventEmitter<null> = new EventEmitter();
+
 
   @Input() subtitleList: { name: string, lang_code: string, lang_translated: string }[];
   @Input() hasScript: boolean;
@@ -40,7 +43,7 @@ export class ToolbarComponent implements OnInit, OnChanges {
   @Input() loading: boolean;
 
   inputProjectKey = '';
-  youtubeLink = '';
+  youtubeLink = 'https://www.youtube.com/watch?v=2PjZAeiU7uM';
 
   languagesSupported = [
     { value: 'ko', viewValue: 'Korean' },
@@ -267,5 +270,13 @@ export class ToolbarComponent implements OnInit, OnChanges {
 
   onShiftTimes() {
     this.shiftTimes.next();
+  }
+
+  onOpenHTU() {
+    this.openHTU.next();
+  }
+
+  onOpenKS() {
+    this.openKS.next();
   }
 }
