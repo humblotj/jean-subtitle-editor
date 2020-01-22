@@ -18,6 +18,8 @@ import { MglishnlService } from './services/mglishnl.service';
 import { ShiftTimesComponent } from './shift-times/shift-times.component';
 import { HowToUseComponent } from './how-to-use/how-to-use.component';
 import { KeyboardShortcutsComponent } from './keyboard-shortcuts/keyboard-shortcuts.component';
+import { RemoveLinesComponent } from './remove-lines/remove-lines.component';
+import { PreviewComponent } from './preview/preview.component';
 
 @Component({
   selector: 'app-subtitle-editor',
@@ -105,8 +107,16 @@ export class SubtitleEditorComponent implements OnInit {
     private mglishNLService: MglishnlService) { }
 
   ngOnInit() {
-    this.matDialog.open(HowToUseComponent);
     const id = this.route.snapshot.queryParams.id;
+    const preview = this.route.snapshot.queryParams.preview;
+    if (typeof preview === 'undefined') {
+      this.matDialog.open(HowToUseComponent);
+    } else {
+      const dialogRef = this.matDialog.open(PreviewComponent);
+      dialogRef.afterClosed().pipe(take(1)).subscribe(() => {
+        this.matDialog.open(HowToUseComponent);
+      });
+    }
     if (typeof id !== 'undefined') {
       this.projectKey = id;
       this.onLoad(id);
@@ -172,7 +182,9 @@ export class SubtitleEditorComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
-    this.projectKey = '';
+    if (this.timeStamp.length) {
+      this.projectKey = '';
+    }
 
     this.do();
 
@@ -1029,6 +1041,29 @@ export class SubtitleEditorComponent implements OnInit {
     const indexActiveTmp = this.indexActive;
     this.indexActive = null;
     setTimeout(() => this.indexActive = indexActiveTmp, 0);
+  }
+
+  onRemoveMultipleSentences() {
+    const dialogRef = this.matDialog.open(RemoveLinesComponent, { data: { length: this.timeStamp.length } });
+    dialogRef.afterClosed().pipe(take(1)).subscribe((result) => {
+      if (result) {
+        this.do();
+        const begin = result.begin - 1 >= 0 ? result.begin - 1 : 0;
+        const end = result.end - 1 <= this.timeStamp.length - 1 ? result.end - 1 : this.timeStamp.length - 1;
+
+        this.timeStamp.splice(begin, end - begin + 1);
+        this.script.splice(begin, end - begin + 1);
+        this.scriptTranslation.splice(begin, end - begin + 1);
+        this.preview.splice(begin, end - begin + 1);
+        this.regions.splice(begin, end - begin + 1);
+
+        this.indexActive = this.timeStamp.length ? 0 : null;
+
+        this.timeStamp = this.timeStamp.slice();
+
+        this.loadRegions();
+      }
+    });
   }
 
   onRemoveEmptySentences() {

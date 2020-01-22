@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment';
 })
 export class MglishnlService {
   private params = new HttpParams().append('key', environment.googleAPIKey);
-  private debug = true;
+  private debug = isDevMode();
 
   constructor(private http: HttpClient) { }
 
@@ -108,7 +108,7 @@ export class MglishnlService {
       let previousPosition = 0;
       let fragment = '';
       for (const key in chunkPositionList) {
-        if (chunkPositionList.hasOwnProperty(key)) {
+        if (chunkPositionList.hasOwnProperty(key) && text.charAt(chunkPositionList[key]) === ' ') {
           const tmp = text.substring(chunkPositionList[previousPosition], chunkPositionList[key]);
           let countBegin = 0;
           let countEnd = tmp.length - 1;
@@ -154,7 +154,7 @@ export class MglishnlService {
       let previousPosition = 0;
       let fragment: string;
       for (const key in chunkPositionList) {
-        if (chunkPositionList.hasOwnProperty(key)) {
+        if (chunkPositionList.hasOwnProperty(key) && text.charAt(chunkPositionList[key]) === ' ') {
           fragment = text.substring(chunkPositionList[previousPosition], chunkPositionList[key]);
           part.push(fragment);
           previousPosition = +key;
@@ -176,7 +176,7 @@ export class MglishnlService {
       let previousPosition = 0;
       let fragment: string;
       for (const key in chunkPositionList) {
-        if (chunkPositionList.hasOwnProperty(key)) {
+        if (chunkPositionList.hasOwnProperty(key) && text.charAt(chunkPositionList[key]) === ' ') {
           fragment = text.substring(chunkPositionList[previousPosition], chunkPositionList[key]);
           part.push(fragment);
           previousPosition = +key;

@@ -5,7 +5,8 @@
   (translate)="translate($event)" (chunkModeChanged)="chunkModeChanged($event)" (save)="onSave()"
   (load)="onLoad($event)" (export)="onExportSubtitle($event)" (downloadProject)="onDownloadProject()"
   (projectNameChanged)="onProjectNameChanged($event)" (autoChunk)="onAutoChunk()" (undoEmit)="undo()"
-  (redoEmit)="redo()" (removeEmptySentences)="onRemoveEmptySentences()" (fixOverlapping)="onFixOverlapping()"
+  (redoEmit)="redo()" (removeMultipleSentences)="onRemoveMultipleSentences()"
+  (removeEmptySentences)="onRemoveEmptySentences()" (fixOverlapping)="onFixOverlapping()"
   (mergeToSentences)="onMergeToSentences($event)" (shiftTimes)="onShiftTimes()" (openHTU)="onOpenHTU()"
   (openKS)="onOpenKS()">
 </app-toolbar>

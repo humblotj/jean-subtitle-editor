@@ -183,13 +183,18 @@
     <mat-tab label="Edit">
       <div fxLayoutAlign="space-between">
         <div fxLayoutAlign="start stretch">
+          <button mat-button (click)="onRemoveMultipleSentences()" [disabled]="!hasScript">
+            <div style="font-size: smaller; white-space: pre-wrap; line-height: 18px;">{{"Remove\nmultiple lines"}}
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
           <button mat-button (click)="onRemoveEmptySentences()" [disabled]="!hasScript">
-            <div style="font-size: smaller; white-space: pre-wrap; line-height: 18px;">{{"Remove\nempty sentences"}}
+            <div style="font-size: smaller; white-space: pre-wrap; line-height: 18px;">{{"Remove\nempty lines"}}
             </div>
           </button>
           <mat-divider [vertical]="true"></mat-divider>
           <button mat-button (click)="onFixOverlapping()" [disabled]="!hasScript">
-            <div style="font-size: smaller; white-space: pre-wrap; line-height: 18px;">{{"Fix overlapping\nsentences"}}
+            <div style="font-size: smaller; white-space: pre-wrap; line-height: 18px;">{{"Fix overlapping\nlines"}}
             </div>
           </button>
           <mat-divider [vertical]="true"></mat-divider>

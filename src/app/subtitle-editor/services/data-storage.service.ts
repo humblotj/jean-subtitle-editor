@@ -11,14 +11,14 @@ export class DataStorageService {
   idChanged = new Subject<string>();
 
   constructor(private http: HttpClient, private db: AngularFireDatabase) {
-    this.itemsRef = this.db.list('subtitles2');
+    this.itemsRef = this.db.list('subtitles');
   }
 
   storeVideo(videoId: string, name: string) {
     let params = new HttpParams();
     params = params.append('id', videoId);
     params = params.append('name', name);
-    const url = 'https://us-central1-phototranslatortest.cloudfunctions.net/youtubedl';
+    const url = 'https://us-central1-jean-subtitle-editor.cloudfunctions.net/youtubedl';
     return this.http.post(url, '', { params });
   }
 
@@ -34,6 +34,6 @@ export class DataStorageService {
   }
 
   getData(id: string) {
-    return this.db.object('subtitles2/' + id).valueChanges();
+    return this.db.object('subtitles/' + id).valueChanges();
   }
 }

@@ -25,6 +25,7 @@ export class ToolbarComponent implements OnInit, OnChanges {
   @Output() autoChunk: EventEmitter<null> = new EventEmitter();
   @Output() undoEmit: EventEmitter<null> = new EventEmitter();
   @Output() redoEmit: EventEmitter<null> = new EventEmitter();
+  @Output() removeMultipleSentences: EventEmitter<null> = new EventEmitter();
   @Output() removeEmptySentences: EventEmitter<null> = new EventEmitter();
   @Output() fixOverlapping: EventEmitter<null> = new EventEmitter();
   @Output() mergeToSentences: EventEmitter<number> = new EventEmitter();
@@ -254,6 +255,10 @@ export class ToolbarComponent implements OnInit, OnChanges {
 
   redo() {
     this.redoEmit.next();
+  }
+
+  onRemoveMultipleSentences() {
+    this.removeMultipleSentences.next();
   }
 
   onRemoveEmptySentences() {

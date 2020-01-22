@@ -1,6 +1,6 @@
 {
   "name": "jean-subtitle-editor",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -33,7 +33,9 @@
     "hammerjs": "^2.0.8",
     "jszip": "^3.2.2",
     "rxjs": "~6.5.4",
+    "stream": "0.0.2",
     "subsrt": "^1.1.1",
+    "timers": "^0.1.1",
     "tslib": "^1.10.0",
     "video.js": "^7.6.6",
     "wavesurfer.js": "^3.3.0",

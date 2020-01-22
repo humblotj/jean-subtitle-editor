@@ -1,8 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, Input, OnChanges, SimpleChanges, Renderer2, Output, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs';
 import { MglishService } from '../services/mglish.service';
 import { SubtitleParserService } from '../services/subtitle-parser.service';
-import { take } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 declare let videojs: any;
 
 @Component({
@@ -34,6 +33,8 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
 
   topText = '';
   bottomText = '';
+
+  version = environment.version;
 
   constructor(private renderer: Renderer2, private mglishService: MglishService, private subtitleParserService: SubtitleParserService) { }
 

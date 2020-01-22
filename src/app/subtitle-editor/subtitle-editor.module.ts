@@ -18,6 +18,8 @@ import { ScriptLineChunkComponent } from './script-line-chunk/script-line-chunk.
 import { ShiftTimesComponent } from './shift-times/shift-times.component';
 import { HowToUseComponent } from './how-to-use/how-to-use.component';
 import { KeyboardShortcutsComponent } from './keyboard-shortcuts/keyboard-shortcuts.component';
+import { RemoveLinesComponent } from './remove-lines/remove-lines.component';
+import { PreviewComponent } from './preview/preview.component';
 
 @NgModule({
   declarations: [SubtitleEditorComponent,
@@ -31,7 +33,9 @@ import { KeyboardShortcutsComponent } from './keyboard-shortcuts/keyboard-shortc
     ScriptLineChunkComponent,
     ShiftTimesComponent,
     HowToUseComponent,
-    KeyboardShortcutsComponent
+    KeyboardShortcutsComponent,
+    RemoveLinesComponent,
+    PreviewComponent
   ],
   imports: [
     SharedModule,
@@ -42,9 +46,11 @@ import { KeyboardShortcutsComponent } from './keyboard-shortcuts/keyboard-shortc
     AngularFireStorageModule,
   ],
   entryComponents: [
+    RemoveLinesComponent,
     ShiftTimesComponent,
     HowToUseComponent,
-    KeyboardShortcutsComponent
+    KeyboardShortcutsComponent,
+    PreviewComponent
   ],
 })
 export class SubtitleEditorModule { }
