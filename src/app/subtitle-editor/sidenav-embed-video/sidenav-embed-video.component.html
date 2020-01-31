@@ -15,8 +15,8 @@
     </div>
     <div fxLayout="row" fxLayoutAlign="start center">
       <button *ngIf="audioVolume!==0" mat-icon-button (click)="muteAudio()">
-        <mat-icon *ngIf="audioVolume>0.5" svgIcon="volume-high"></mat-icon>
-        <mat-icon *ngIf="0.5>=audioVolume" svgIcon="volume-medium"></mat-icon>
+        <mat-icon *ngIf="audioVolume>0.25" svgIcon="volume-high"></mat-icon>
+        <mat-icon *ngIf="0.25>=audioVolume" svgIcon="volume-medium"></mat-icon>
       </button>
       <button *ngIf="audioVolume===0" mat-icon-button (click)="unmuteAudio()">
         <mat-icon svgIcon="volume-low"></mat-icon>
@@ -27,7 +27,7 @@
     </div>
   </div>
   <app-detail-sentence-renderer [topText]="topText" [bottomText]="bottomText"></app-detail-sentence-renderer>
-  <hr *ngIf="script.length" style="border-top: 1px solid #ddd">
+  <hr *ngIf="script.length" style="border-top: 1px solid #ddd"/>
   <div style="padding: 12px 16px; font-size: 16px; color: rgba(80,80,80,0.64)">{{scriptTranslation[indexActive]}}</div>
 </div>
 <div style="position: absolute; bottom:0; width:100%"fxLayoutAlign="space-between">

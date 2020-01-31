@@ -16,8 +16,6 @@ export class ScriptLineComponent implements OnInit, OnChanges {
   @Input() timeStamp: { startMs: number, endMs: number }[];
   @Input() script: string[];
   @Input() scriptTranslation: string[];
-  @Input() sentence: string;
-  @Input() translation: string;
   @Input() index: number;
   @Input() indexActive: number;
   @Input() paused: number;
@@ -36,9 +34,6 @@ export class ScriptLineComponent implements OnInit, OnChanges {
   oldEnd: string;
   overlappingBegin = false;
   overlappingEnd = false;
-
-  chunkTexts = [];
-  chunks = [];
 
   scriptInputFocused: boolean;
 
@@ -89,17 +84,6 @@ export class ScriptLineComponent implements OnInit, OnChanges {
         this.overlappingEnd = this.endMs > this.nextStartMs;
       }
     }
-    if (changes.sentence) {
-      this.chunkTexts = [];
-      this.chunks = [];
-      const regex = RegExp(/[\s|]+/g);
-      let match = regex.exec(this.sentence);
-      while (match != null) {
-        this.chunks.push(match[0].match(/\|/g) !== null);
-        match = regex.exec(this.sentence);
-      }
-      this.chunkTexts = this.sentence.split(/[\s|]+/g);
-    }
     if (changes.indexActive && !changes.indexActive.firstChange) {
       if (this.index === this.indexActive && this.index !== null && !this.clicked) {
         if (changes.indexActive.previousValue < changes.indexActive.currentValue) {
@@ -113,10 +97,6 @@ export class ScriptLineComponent implements OnInit, OnChanges {
         this.clicked = false;
       }
     }
-  }
-
-  toggleChunk(index: number) {
-    this.chunks[index] = !this.chunks[index];
   }
 
   updateStart(event) {

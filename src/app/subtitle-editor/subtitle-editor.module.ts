@@ -11,7 +11,6 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
 import { AudiovizualizerComponent } from './audiovizualizer/audiovizualizer.component';
 import { ScriptLineComponent } from './script-line/script-line.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { ScriptEditComponent } from './script-edit/script-edit.component';
 import { DetailSentenceRendererComponent } from './sidenav-embed-video/detail-sentence-renderer/detail-sentence-renderer.component';
 import { MssRendererComponent } from './sidenav-embed-video/mss-renderer/mss-renderer.component';
 import { ScriptLineChunkComponent } from './script-line-chunk/script-line-chunk.component';
@@ -27,7 +26,6 @@ import { PreviewComponent } from './preview/preview.component';
     ToolbarComponent,
     AudiovizualizerComponent,
     ScriptLineComponent,
-    ScriptEditComponent,
     DetailSentenceRendererComponent,
     MssRendererComponent,
     ScriptLineChunkComponent,

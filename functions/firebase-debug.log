@@ -1,0 +1,19 @@
+[debug] [2020-01-15T05:01:51.772Z] ----------------------------------------------------------------------
+[debug] [2020-01-15T05:01:51.775Z] Command:       /usr/local/bin/node /usr/local/bin/firebase deploy --only functions
+[debug] [2020-01-15T05:01:51.775Z] CLI Version:   7.0.0
+[debug] [2020-01-15T05:01:51.775Z] Platform:      darwin
+[debug] [2020-01-15T05:01:51.775Z] Node Version:  v10.16.0
+[debug] [2020-01-15T05:01:51.776Z] Time:          Wed Jan 15 2020 14:01:51 GMT+0900 (GMT+09:00)
+[debug] [2020-01-15T05:01:51.776Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2020-01-15T05:01:51.789Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2020-01-15T05:01:51.790Z] > authorizing via signed-in user
+[debug] [2020-01-15T05:01:51.790Z] [iam] checking project jean-subtitle-editor for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2020-01-15T05:01:51.792Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/jean-subtitle-editor:testIamPermissions  
+
+[debug] [2020-01-15T05:01:53.494Z] <<< HTTP RESPONSE 200
+[debug] [2020-01-15T05:01:55.501Z] TypeError: Cannot read property 'wanted' of undefined
+    at /usr/local/lib/node_modules/firebase-tools/lib/checkFirebaseSDKVersion.js:37:51
+    at process._tickCallback (internal/process/next_tick.js:68:7)
+[error] 
+[error] Error: An unexpected error has occurred.

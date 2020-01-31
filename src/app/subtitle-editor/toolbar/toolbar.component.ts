@@ -128,11 +128,11 @@ export class ToolbarComponent implements OnInit, OnChanges {
   onSubtitleFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file != null) {
-      const filename = file.name.split('.').pop().toLowerCase();
+      const extension = file.name.split('.').pop().toLowerCase();
       const fileReader = new FileReader();
       fileReader.onload = () => {
         const data = fileReader.result;
-        this.subtitleSelected.emit(this.subtitleParserService.parse(data, filename));
+        this.subtitleSelected.emit(this.subtitleParserService.parse(data, extension));
       };
       fileReader.readAsText(file);
     }

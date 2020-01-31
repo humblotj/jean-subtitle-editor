@@ -1,0 +1,18 @@
+<mat-dialog-content fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="10px"
+  style="padding-top:10px;padding-bottom: 10px">
+  <div fxLayout="row" fxLayoutGap="10px">
+    <mat-form-field>
+      <input matInput type="number" placeholder="Start Row" [(ngModel)]="begin" (focus)="updateOldBegin($event)"
+        (focusout)="updateBegin($event)" required>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="number" placeholder="End Row" [(ngModel)]="end" (focus)="updateOldEnd($event)"
+        (focusout)="updateEnd($event)" required>
+    </mat-form-field>
+  </div>
+  <div fxLayoutAlign="end" style="width: 100%;">
+    <button mat-stroked-button (click)="removeLines()">
+      Remove Lines
+    </button>
+  </div>
+</mat-dialog-content>

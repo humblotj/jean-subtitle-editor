@@ -27,6 +27,10 @@ import { PreviewComponent } from './preview/preview.component';
   styleUrls: ['./subtitle-editor.component.css']
 })
 export class SubtitleEditorComponent implements OnInit {
+  @ViewChild(CdkVirtualScrollViewport, { static: false }) viewPort: CdkVirtualScrollViewport;
+  @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
+  contextMenuPosition = { x: '0px', y: '0px' };
+
   projectKey = '';
   projectName = 'Subtitle';
   lastSaveDate: Date = null;
@@ -37,11 +41,7 @@ export class SubtitleEditorComponent implements OnInit {
   url = '';
   videoType = '';
   videoId = '';
-  subtitleList: string[] = [];
   paused = true;
-
-  loading = false;
-  errorMessage = '';
 
   private repeatTimeout = null;
   private regions = [];
@@ -49,12 +49,12 @@ export class SubtitleEditorComponent implements OnInit {
   private adjacentTimeUpdated = false;
   private labelSelected = 'original text';
 
-  chunkMode = false;
-
   private timeout = null;
   private onTimeUpdate = null;
 
-  @ViewChild(CdkVirtualScrollViewport, { static: false }) viewPort: CdkVirtualScrollViewport;
+  chunkMode = false;
+
+  subtitleList: string[] = [];
   timeStamp: { startMs: number, endMs: number }[] = [];
   script: string[] = [];
   scriptTranslation: string[] = [];
@@ -65,9 +65,6 @@ export class SubtitleEditorComponent implements OnInit {
     timeStamp: { startMs: number, endMs: number },
     script: string, scriptTranslation: string, preview: { en: string, ko: string, rpa: string }
   } = null;
-
-  @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
-  contextMenuPosition = { x: '0px', y: '0px' };
 
   dataUndoArray: Array<{
     timeStamp: { startMs: number, endMs: number }[], script: string[],
@@ -80,6 +77,9 @@ export class SubtitleEditorComponent implements OnInit {
   undoLimit = 5;
   showUndo = false;
   showRedo = false;
+
+  loading = false;
+  errorMessage = '';
 
   @HostListener('keydown', ['$event'])
   keyEvent(event: KeyboardEvent) {

@@ -1,0 +1,13 @@
+<h3>Mglish Player Preview</h3>
+<div fxLayout="row">
+  <button mat-icon-button (click)="previous()" style="margin: auto; margin-left: -24px;" aria-label="Previous">
+    <mat-icon svgIcon="arrow-left"></mat-icon>
+  </button>
+  <div fxLayout="column" fxLayoutAlign="start center">
+    <div style="margin-bottom: 20px;">{{texts[index]}}</div>
+    <img [src]="srcs[index]" alt="" style="height: 400px">
+  </div>
+  <button mat-icon-button (click)="next()" style="margin: auto; margin-right: -24px;" aria-label="Next">
+    <mat-icon svgIcon="arrow-right"></mat-icon>
+  </button>
+</div>

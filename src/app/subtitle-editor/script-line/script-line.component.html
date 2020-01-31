@@ -9,8 +9,6 @@
       (click)="onPause()">pause</mat-icon>
   </div>
   <div fxLayout="column" fxLayoutAlign="center center" style="margin-left: 12px; margin-top: 10px;">
-    <!-- <span style="color: gray; font-size: small;">{{startTime}}</span>
-    <span style="color: gray; font-size: small;">{{endTime}}</span> -->
     <mat-form-field style="width: 56px; margin:-17px 0" appearance="none">
       <input type="text" matInput #startInput [ngModel]="startTime" pattern="^[0-5][0-9]:[0-5][0-9].[0-9]{2}"
         [ngClass]="{'overlap':overlappingBegin}" (focus)="oldStart=$event.target.value" (focusout)="updateStart($event)"
@@ -27,19 +25,10 @@
       <textarea #scriptInput matInput [(ngModel)]="script[index]" class="text-preview" rows="1"
         (click)="scriptInputFocused=true"></textarea>
     </mat-form-field>
-    <hr class="underline">
+    <hr class="underline"/>
     <mat-form-field style="width: 100%; margin-bottom: -25px; margin-top: -14px" appearance="none">
       <textarea #scriptTranslationInput matInput [(ngModel)]="scriptTranslation[index]" class="text-preview"
         rows="1"></textarea>
     </mat-form-field>
-    <!-- <hr class="underline">
-    <div fxLayout="row">
-      <span *ngIf="chunkTexts.length!==0">{{chunkTexts[0]}}</span>
-      <ng-container *ngFor="let chunk of chunks; let i = index">
-        <span style="width: 10px; text-align: center; color: red; cursor: pointer;"
-          (click)="toggleChunk(i)">{{chunk ? '|' : ''}}</span>
-        <span>{{chunkTexts[i+1]}}</span>
-      </ng-container>
-    </div> -->
   </div>
 </div>
