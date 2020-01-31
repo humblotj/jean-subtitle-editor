@@ -1055,7 +1055,6 @@ export class SubtitleEditorComponent implements OnInit {
         this.script.splice(begin, end - begin + 1);
         this.scriptTranslation.splice(begin, end - begin + 1);
         this.preview.splice(begin, end - begin + 1);
-        this.regions.splice(begin, end - begin + 1);
 
         this.indexActive = this.timeStamp.length ? 0 : null;
 
