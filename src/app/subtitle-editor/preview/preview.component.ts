@@ -13,8 +13,8 @@ export class PreviewComponent implements OnInit {
     '4. Test your pronunciation.',
     '5. Press to see your errors.',
     '6. Test your pronunciation and get a perfect score.'];
-  srcs = ['assets/img/p1.jpeg', 'assets/img/p2.jpeg', 'assets/img/p3.jpeg',
-    'assets/img/p5.jpeg', 'assets/img/p6.jpeg', 'assets/img/p4.jpeg'];
+  srcs = ['assets/img/p1.png', 'assets/img/p2.png', 'assets/img/p3.png',
+    'assets/img/p5.png', 'assets/img/p6.png', 'assets/img/p4.png'];
 
   @HostListener('keydown', ['$event'])
   keyEvent(event: KeyboardEvent) {

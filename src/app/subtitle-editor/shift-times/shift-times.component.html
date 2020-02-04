@@ -19,7 +19,7 @@
         (focusout)="updateEnd($event)" required>
     </mat-form-field>
   </div>
-  <mat-radio-group [(ngModel)]="times" fxLayout.gt-xs="row" fxLayout.xs="column" fxLayoutGap="4px">
+  <mat-radio-group [(ngModel)]="target" fxLayout.gt-xs="row" fxLayout.xs="column" fxLayoutGap="4px">
     <mat-radio-button value="both" color="primary">Start and End times</mat-radio-button>
     <mat-radio-button value="start" color="primary">Start times only</mat-radio-button>
     <mat-radio-button value="end" color="primary">End times only</mat-radio-button>

@@ -18,7 +18,7 @@ export class ShiftTimesComponent implements OnInit {
   oldBegin = 1;
   end: number;
   oldEnd: number;
-  times: 'both' | 'start' | 'end' = 'both';
+  target: 'both' | 'start' | 'end' = 'both';
 
   constructor(private dialogRef: MatDialogRef<ShiftTimesComponent>,
     @Inject(MAT_DIALOG_DATA) private data: { length: number },
@@ -70,7 +70,7 @@ export class ShiftTimesComponent implements OnInit {
     if (this.begin !== null && this.end !== null) {
       this.dialogRef.close({
         begin: this.begin, end: this.end,
-        time: this.time, timeMs: this.timeMs, times: this.times, forward: this.forward
+        time: this.time, timeMs: this.timeMs, target: this.target, forward: this.forward
       });
     }
   }
