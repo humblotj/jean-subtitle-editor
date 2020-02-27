@@ -21,7 +21,7 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
   @Output() played: EventEmitter<boolean> = new EventEmitter();
   @Output() audioVolumeChanged: EventEmitter<number> = new EventEmitter();
 
-  @ViewChild('videoPlayerContainer', { static: false }) videoPlayerContainer: ElementRef;
+  @ViewChild('videoPlayerContainer') videoPlayerContainer: ElementRef;
   playerReady = false;
   duration = '';
   private durationSeconds = 0;

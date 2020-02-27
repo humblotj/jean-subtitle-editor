@@ -8,7 +8,7 @@ import { SubtitleParserService } from '../services/subtitle-parser.service';
   styleUrls: ['./shift-times.component.css']
 })
 export class ShiftTimesComponent implements OnInit {
-  @ViewChild('timeInput', { static: false }) timeInput: ElementRef;
+  @ViewChild('timeInput') timeInput: ElementRef;
   timeMs = 0;
   time = '00:00.00';
   oldTimeMs: number;

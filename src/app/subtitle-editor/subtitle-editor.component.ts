@@ -27,8 +27,8 @@ import { PreviewComponent } from './preview/preview.component';
   styleUrls: ['./subtitle-editor.component.css']
 })
 export class SubtitleEditorComponent implements OnInit {
-  @ViewChild(CdkVirtualScrollViewport, { static: false }) viewPort: CdkVirtualScrollViewport;
-  @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
+  @ViewChild(CdkVirtualScrollViewport) viewPort: CdkVirtualScrollViewport;
+  @ViewChild(MatMenuTrigger) contextMenu: MatMenuTrigger;
   contextMenuPosition = { x: '0px', y: '0px' };
 
   projectKey = '';

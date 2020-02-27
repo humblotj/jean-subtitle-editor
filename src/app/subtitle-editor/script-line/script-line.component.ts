@@ -19,10 +19,10 @@ export class ScriptLineComponent implements OnInit, OnChanges {
   @Input() index: number;
   @Input() indexActive: number;
   @Input() paused: number;
-  @ViewChild('startInput', { static: false }) startInput: ElementRef;
-  @ViewChild('endInput', { static: false }) endInput: ElementRef;
-  @ViewChild('scriptInput', { static: false }) scriptInput: ElementRef;
-  @ViewChild('scriptTranslationInput', { static: false }) scriptTranslationInput: ElementRef;
+  @ViewChild('startInput') startInput: ElementRef;
+  @ViewChild('endInput') endInput: ElementRef;
+  @ViewChild('scriptInput') scriptInput: ElementRef;
+  @ViewChild('scriptTranslationInput') scriptTranslationInput: ElementRef;
   @Output() playRegion: EventEmitter<null> = new EventEmitter();
   @Output() pause: EventEmitter<null> = new EventEmitter();
   @Output() lineClick: EventEmitter<number> = new EventEmitter();
