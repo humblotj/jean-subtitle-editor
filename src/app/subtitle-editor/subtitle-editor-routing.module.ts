@@ -4,15 +4,15 @@ import { SubtitleEditorComponent } from './subtitle-editor.component';
 
 
 const routes: Routes = [
-    { path: 'subtitle-editor', component: SubtitleEditorComponent }
+  { path: 'subtitle-editor', component: SubtitleEditorComponent }
 ];
 
 @NgModule({
-    imports: [
-        RouterModule.forChild(routes)
-    ],
-    exports: [
-        RouterModule
-    ]
+  imports: [
+    RouterModule.forChild(routes)
+  ],
+  exports: [
+    RouterModule
+  ]
 })
 export class SubtitleEditorRoutingModule { }

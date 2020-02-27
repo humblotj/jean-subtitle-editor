@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { SubtitleEditorComponent } from './subtitle-editor/subtitle-editor.component';
 
 const routes: Routes = [
-  { path: '', component: SubtitleEditorComponent }
+  {
+    path: '', loadChildren: () => import('./subtitle-editor/subtitle-editor.module').then(m => m.SubtitleEditorModule),
+  }
 ];
 
 @NgModule({

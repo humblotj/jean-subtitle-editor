@@ -706,7 +706,7 @@ export class SubtitleEditorComponent implements OnInit {
     this.script = script;
     this.scriptTranslation = scriptTranslation;
     if (this.wavesurfer) {
-      this.loadRegions();
+      this.timeoutLoadRegions();
     }
 
     this.loading = false;

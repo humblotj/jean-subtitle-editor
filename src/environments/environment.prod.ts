@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  hmr: false,
   firebaseConfig: {
     apiKey: 'AIzaSyDCo6jnn2pbiXmRIpoDCgysJ7XWP38MJi4',
     authDomain: 'jean-subtitle-editor.firebaseapp.com',
