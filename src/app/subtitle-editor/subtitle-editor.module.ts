@@ -1,7 +1,4 @@
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
-import { AngularFireStorageModule } from '@angular/fire/storage';
-import { AngularFireDatabaseModule } from '@angular/fire/database';
 
 import { SubtitleEditorComponent } from './subtitle-editor.component';
 import { SubtitleEditorRoutingModule } from './subtitle-editor-routing.module';
@@ -37,11 +34,8 @@ import { PreviewComponent } from './preview/preview.component';
   ],
   imports: [
     SharedModule,
-    HttpClientModule,
     SubtitleEditorRoutingModule,
     ScrollingModule,
-    AngularFireDatabaseModule,
-    AngularFireStorageModule,
   ],
   entryComponents: [
     RemoveLinesComponent,
