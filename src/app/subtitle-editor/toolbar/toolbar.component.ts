@@ -18,21 +18,21 @@ export class ToolbarComponent implements OnInit, OnChanges {
   @Output() translate: EventEmitter<{ sourceLanguage: string, targetLanguage: string }> = new EventEmitter();
   @Output() export: EventEmitter<{ extensionExport: string, script: boolean }> = new EventEmitter();
   @Output() chunkModeChanged: EventEmitter<boolean> = new EventEmitter();
-  @Output() save: EventEmitter<null> = new EventEmitter();
+  @Output() save: EventEmitter<void> = new EventEmitter();
   @Output() load: EventEmitter<string> = new EventEmitter();
-  @Output() downloadProject: EventEmitter<null> = new EventEmitter();
+  @Output() downloadProject: EventEmitter<void> = new EventEmitter();
   @Output() projectNameChanged: EventEmitter<string> = new EventEmitter();
-  @Output() autoChunk: EventEmitter<null> = new EventEmitter();
-  @Output() undoEmit: EventEmitter<null> = new EventEmitter();
-  @Output() redoEmit: EventEmitter<null> = new EventEmitter();
-  @Output() removeMultipleSentences: EventEmitter<null> = new EventEmitter();
-  @Output() removeEmptySentences: EventEmitter<null> = new EventEmitter();
-  @Output() fixOverlapping: EventEmitter<null> = new EventEmitter();
+  @Output() autoChunk: EventEmitter<void> = new EventEmitter();
+  @Output() undoEmit: EventEmitter<void> = new EventEmitter();
+  @Output() redoEmit: EventEmitter<void> = new EventEmitter();
+  @Output() removeMultipleSentences: EventEmitter<void> = new EventEmitter();
+  @Output() removeEmptySentences: EventEmitter<void> = new EventEmitter();
+  @Output() fixOverlapping: EventEmitter<void> = new EventEmitter();
   @Output() mergeToSentences: EventEmitter<number> = new EventEmitter();
-  @Output() shiftTimes: EventEmitter<null> = new EventEmitter();
-  @Output() openHTU: EventEmitter<null> = new EventEmitter();
-  @Output() openKS: EventEmitter<null> = new EventEmitter();
-
+  @Output() shiftTimes: EventEmitter<void> = new EventEmitter();
+  @Output() openHTU: EventEmitter<void> = new EventEmitter();
+  @Output() openKS: EventEmitter<void> = new EventEmitter();
+  @Output() openPreview: EventEmitter<void> = new EventEmitter();
 
   @Input() subtitleList: { name: string, lang_code: string, lang_translated: string }[];
   @Input() hasScript: boolean;
@@ -283,5 +283,9 @@ export class ToolbarComponent implements OnInit, OnChanges {
 
   onOpenKS() {
     this.openKS.next();
+  }
+
+  onOpenPreview() {
+    this.openPreview.next();
   }
 }

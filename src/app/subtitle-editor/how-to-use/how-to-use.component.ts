@@ -1,9 +1,10 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-how-to-use',
   templateUrl: './how-to-use.component.html',
-  styleUrls: ['./how-to-use.component.css']
+  styleUrls: ['./how-to-use.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HowToUseComponent implements OnInit {
   index = 0;

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener, ChangeDetectorRef } from '@angular/core';
 import { take } from 'rxjs/operators';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
@@ -105,7 +105,8 @@ export class SubtitleEditorComponent implements OnInit {
     private translateService: TranslateService,
     private subtitleParserService: SubtitleParserService,
     private mglishService: MglishService,
-    private mglishNLService: MglishnlService) { }
+    private mglishNLService: MglishnlService,
+    private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
     const id = this.route.snapshot.queryParams.id;
@@ -197,10 +198,15 @@ export class SubtitleEditorComponent implements OnInit {
         });
         const dataFile = this.subtitleParserService.build(dataJSON, 'srt');
         this.mglishService.getMglishSubtitles(dataFile).subscribe(
-          (result: any) => { this.preview = result; });
+          (result: any) => {
+            this.preview = result;
+            this.cdr.markForCheck();
+          });
 
         this.loading = false;
       }
+
+      this.cdr.markForCheck();
     });
   }
 
@@ -265,6 +271,7 @@ export class SubtitleEditorComponent implements OnInit {
             this.dispose();
             this.url = downloadURL;
             this.displaySubtitles(videoId);
+            this.cdr.markForCheck();
           }
         },
         error => {
@@ -280,7 +287,10 @@ export class SubtitleEditorComponent implements OnInit {
     params = params.append('v', videoId);
     this.http
       .get(url, { responseType: 'text', params })
-      .subscribe(result => this.parseXml(result));
+      .subscribe(result => {
+        this.parseXml(result);
+        this.cdr.markForCheck();
+      });
   }
 
   parseXml(xmlStr) {
@@ -702,7 +712,10 @@ export class SubtitleEditorComponent implements OnInit {
     });
     const dataFile = this.subtitleParserService.build(dataJSON, 'srt');
     this.mglishService.getMglishSubtitles(dataFile).subscribe(
-      (result: any) => { this.preview = result; });
+      (result: any) => {
+        this.preview = result;
+        this.cdr.markForCheck();
+      });
     this.indexActive = 0;
     this.script = script;
     this.scriptTranslation = scriptTranslation;
@@ -769,11 +782,12 @@ export class SubtitleEditorComponent implements OnInit {
         this.scriptTranslation = scriptTranslation;
 
         this.loading = false;
+        this.cdr.markForCheck();
       },
         err => {
           console.error(err);
           this.loading = false;
-          this.errorMessage = err;
+          alert("API free usage limit exceeded")
         });
     }
   }
@@ -992,6 +1006,8 @@ export class SubtitleEditorComponent implements OnInit {
         this.timeStamp = this.timeStamp.slice();
 
         this.loadRegions();
+
+        this.cdr.markForCheck();
       }
     });
   }
@@ -1084,6 +1100,7 @@ export class SubtitleEditorComponent implements OnInit {
           }
         }
         this.loadRegions();
+        this.cdr.markForCheck();
       }
     });
   }
@@ -1206,7 +1223,10 @@ export class SubtitleEditorComponent implements OnInit {
       });
       const dataFile = this.subtitleParserService.build(dataJSON, 'srt');
       this.mglishService.getMglishSubtitles(dataFile).subscribe(
-        (result: any) => { this.preview = result; });
+        (result: any) => {
+          this.preview = result;
+          this.cdr.markForCheck();
+        });
     }
   }
 
@@ -1235,6 +1255,7 @@ export class SubtitleEditorComponent implements OnInit {
           (resultPreview: any) => { this.preview = resultPreview; });
 
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error => {
         console.error(error);
@@ -1253,6 +1274,10 @@ export class SubtitleEditorComponent implements OnInit {
 
   onOpenKS() {
     this.matDialog.open(KeyboardShortcutsComponent);
+  }
+
+  onOpenPreview() {
+    this.matDialog.open(PreviewComponent);
   }
 
 }

@@ -255,11 +255,21 @@
             </div>
           </button>
           <mat-divider [vertical]="true"></mat-divider>
+          <button mat-button (click)="onOpenPreview()">
+            <div fxLayout="column" fxLayoutAlign="center center">
+              <mat-icon svgIcon="file-eye-outline" style="margin-top: 8px;"></mat-icon>
+              <span style="font-size: smaller;margin-top: -10px;">App Preview</span>
+            </div>
+          </button>
+          <mat-divider [vertical]="true"></mat-divider>
         </div>
         <ng-template [ngTemplateOutlet]="commonButtons"></ng-template>
       </div>
     </mat-tab>
   </mat-tab-group>
+  <div style="position:absolute; right: 10px; top: 0; line-height: 29px;">
+    <a href="https://gitlab.com/humblotj/jean-subtitle-editor" style="font-size: 10px;">Gitlab</a>
+  </div>
 </mat-toolbar>
 
 <ng-template #commonButtons>

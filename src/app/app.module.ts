@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireStorage, AngularFireStorageModule } from '@angular/fire/storage';
-import { AngularFireFunctionsModule, FunctionsRegionToken } from '@angular/fire/functions';
+import { AngularFireFunctionsModule, REGION } from '@angular/fire/functions';
 import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { MatIconRegistry } from '@angular/material/icon';
@@ -34,7 +34,7 @@ import { HttpClientModule } from '@angular/common/http';
     AngularFireFunctionsModule,
   ],
   providers: [AngularFireStorage,
-    { provide: FunctionsRegionToken, useValue: 'us-central1' }
+    { provide: REGION, useValue: 'us-central1' }
   ],
   bootstrap: [AppComponent],
 })

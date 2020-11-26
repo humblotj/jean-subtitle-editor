@@ -1,10 +1,11 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-remove-lines',
   templateUrl: './remove-lines.component.html',
-  styleUrls: ['./remove-lines.component.css']
+  styleUrls: ['./remove-lines.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RemoveLinesComponent implements OnInit {
   begin = 1;

@@ -1,10 +1,11 @@
-import { Component, OnInit, Input, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, SimpleChanges, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import Colors from '../../Colors';
 
 @Component({
   selector: 'app-mss-renderer',
   templateUrl: './mss-renderer.component.html',
-  styleUrls: ['./mss-renderer.component.css']
+  styleUrls: ['./mss-renderer.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MssRendererComponent implements OnInit, OnChanges {
   @Input() defaultColor: string;
@@ -12,43 +13,44 @@ export class MssRendererComponent implements OnInit, OnChanges {
   @Input() onlyBold: boolean;
   @Input() text: string;
 
-  mStyles = {
-    default: {
-      color: this.defaultColor || 'black',
-      size: this.defaultSize || 24,
-      bold: false,
-      italic: false,
-    },
-    t0: {
-      color: this.defaultColor || 'black',
-      size: this.defaultSize || 24,
-      bold: false,
-      italic: false,
-    },
-    t1: {
-      color: Colors.accent,
-      size: this.defaultSize || 24,
-      bold: true,
-      italic: false,
-    },
-    t2: {
-      color: this.defaultColor || 'black',
-      size: this.defaultSize || 24,
-      bold: true,
-      italic: false,
-    },
-    t3: {
-      color: this.defaultColor || 'black',
-      size: this.defaultSize || 24,
-      bold: false,
-      italic: true,
-    },
-  };
+  mStyles;
   views;
 
   constructor() { }
 
   ngOnInit() {
+    this.mStyles = {
+      default: {
+        color: this.defaultColor || 'black',
+        size: this.defaultSize || 24,
+        bold: false,
+        italic: false,
+      },
+      t0: {
+        color: this.defaultColor || 'black',
+        size: this.defaultSize || 24,
+        bold: false,
+        italic: false,
+      },
+      t1: {
+        color: Colors.accent,
+        size: this.defaultSize || 24,
+        bold: true,
+        italic: false,
+      },
+      t2: {
+        color: this.defaultColor || 'black',
+        size: this.defaultSize || 24,
+        bold: true,
+        italic: false,
+      },
+      t3: {
+        color: this.defaultColor || 'black',
+        size: this.defaultSize || 24,
+        bold: false,
+        italic: true,
+      },
+    };
   }
 
   ngOnChanges(changes: SimpleChanges) {

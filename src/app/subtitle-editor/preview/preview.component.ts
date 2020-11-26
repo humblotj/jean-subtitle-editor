@@ -1,9 +1,10 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-preview',
   templateUrl: './preview.component.html',
-  styleUrls: ['./preview.component.css']
+  styleUrls: ['./preview.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PreviewComponent implements OnInit {
   index = 0;

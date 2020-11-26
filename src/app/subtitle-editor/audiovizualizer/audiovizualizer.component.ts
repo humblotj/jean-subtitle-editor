@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, SimpleChanges, OnChanges, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Input, SimpleChanges, OnChanges, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import * as WaveSurfer from 'wavesurfer.js';
 import * as RegionsPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.regions.js';
 import * as TimelinePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.timeline.js';
@@ -7,7 +7,8 @@ import * as TimelinePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.timeline.j
   selector: 'app-audiovizualizer',
   templateUrl: './audiovizualizer.component.html',
   styleUrls: ['./audiovizualizer.component.css'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AudiovizualizerComponent implements OnInit, OnChanges {
   @Input() url: string;
@@ -19,7 +20,7 @@ export class AudiovizualizerComponent implements OnInit, OnChanges {
   progressRate = 100;
   paused = true;
 
-  constructor() { }
+  constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
   }
@@ -60,10 +61,12 @@ export class AudiovizualizerComponent implements OnInit, OnChanges {
       // if (e === 100) {
       //   this.timeoutIsReady();
       // }
+      this.cdr.markForCheck();
     });
 
     wavesurfer.on('interaction', e => {
       this.seekTo.emit(e * 100);
+      this.cdr.markForCheck();
     });
 
     this.wavesurferInitialized.emit(wavesurfer);

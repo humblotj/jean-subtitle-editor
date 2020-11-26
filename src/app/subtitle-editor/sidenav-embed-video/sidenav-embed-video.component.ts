@@ -67,6 +67,7 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
                 this.preview[previousIndex].ko = result[0].ko;
                 this.topText = this.preview[this.indexActive].en;
                 this.bottomText = this.preview[this.indexActive].ko;
+                this.topText = this.scriptTranslation[this.indexActive];
               });
           }
         }
@@ -77,8 +78,9 @@ export class SidenavEmbedVideoComponent implements OnInit, OnChanges {
     }
     if (changes.preview && this.indexActive !== null) {
       if (this.preview != null) {
-        this.topText = this.preview[this.indexActive].en;
-        this.bottomText = this.preview[this.indexActive].ko;
+        // this.topText = this.preview[this.indexActive].en;
+        // this.bottomText = this.preview[this.indexActive].ko;
+        this.topText = this.scriptTranslation[this.indexActive];
       }
     }
   }

@@ -1,11 +1,12 @@
-import { Component, OnInit, Input, SimpleChanges, OnChanges, ElementRef, ViewChild, Output, EventEmitter, HostListener } from '@angular/core';
+import { Component, OnInit, Input, SimpleChanges, OnChanges, ElementRef, ViewChild, Output, EventEmitter, HostListener, ChangeDetectionStrategy } from '@angular/core';
 
 import { SubtitleParserService } from '../services/subtitle-parser.service';
 
 @Component({
   selector: 'app-script-line',
   templateUrl: './script-line.component.html',
-  styleUrls: ['./script-line.component.css']
+  styleUrls: ['./script-line.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ScriptLineComponent implements OnInit, OnChanges {
   @Input() previousEndMs: number;

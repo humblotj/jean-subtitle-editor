@@ -1,11 +1,12 @@
-import { Component, OnInit, ViewChild, ElementRef, Inject } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SubtitleParserService } from '../services/subtitle-parser.service';
 
 @Component({
   selector: 'app-shift-times',
   templateUrl: './shift-times.component.html',
-  styleUrls: ['./shift-times.component.css']
+  styleUrls: ['./shift-times.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ShiftTimesComponent implements OnInit {
   @ViewChild('timeInput') timeInput: ElementRef;
